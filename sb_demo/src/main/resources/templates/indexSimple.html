@@ -16,20 +16,14 @@
 		<link th:href="${'/css/sbDemo.css'}" rel="stylesheet" />
 	</head>
 	
-	<body>
+	<body style="background: url(../../image/login_bgx.gif);">
 		<div id="wrapper">
-			<!--header-->
-			<div th:replace="fragments/header :: header"></div>
-			
 			<!-- body -->
-			<div class='mainBody' style="margin-top: 20px;">
+			<div class='mainBody'>
 				<div th:if="${template}">
 					<div th:replace="${template}"></div>
 			    </div>
 			</div>
-			
-			<!--footer-->
-			<div th:replace="fragments/footer :: footer"></div>
 		</div>
 	</body>
 </html>
