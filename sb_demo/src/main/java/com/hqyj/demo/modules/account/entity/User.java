@@ -26,6 +26,10 @@ public class User {
 	private Date createDate;
 	
 	@Transient
+	private String account;
+	@Transient
+	private boolean rememberMe;
+	@Transient
 	private List<Role> roles;
 
 	public int getUserId() {
@@ -66,5 +70,21 @@ public class User {
 
 	public void setRoles(List<Role> roles) {
 		this.roles = roles;
+	}
+
+	public String getAccount() {
+		return account;
+	}
+
+	public void setAccount(String account) {
+		this.account = account;
+	}
+
+	public boolean getRememberMe() {
+		return rememberMe;
+	}
+
+	public void setRememberMe(boolean rememberMe) {
+		this.rememberMe = rememberMe;
 	}
 }

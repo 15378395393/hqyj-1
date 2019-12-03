@@ -12,6 +12,9 @@ public interface AccountService {
 	// 根据userName和password查询user
 	Result getUserByUserNameAndPassword(User user);
 	
+	// 用户登录操作
+	Result doLogin(User user);
+	
 	// 根据userName查询user
 	User getUserByName(String userName);
 	

@@ -3,8 +3,12 @@ package com.hqyj.demo.modules.account.controller;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.annotation.RequiresRoles;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -47,7 +51,7 @@ public class AccountController {
 	@PostMapping(value="/doLogin", consumes="application/json")
 	@ResponseBody
 	public Result doLogin(@RequestBody User user) {
-		return accountService.getUserByUserNameAndPassword(user);
+		return accountService.doLogin(user);
 	}
 	
 	/**
@@ -55,6 +59,8 @@ public class AccountController {
 	 */
 	@RequestMapping("/logout")
 	public String logout(HttpServletRequest request, ModelMap modelMap) {
+		Subject subject = SecurityUtils.getSubject();
+		subject.logout();
 		return "redirect:/account/login";
 	}
 	
@@ -73,13 +79,7 @@ public class AccountController {
 			method=RequestMethod.POST, consumes="application/json")
 	@ResponseBody
 	public Result doRegister(HttpServletRequest request, @RequestBody User user) {
-		Result result = accountService.addUser(user);
-		
-		//存入Session
-    	HttpSession session = request.getSession(true);
-    	session.setAttribute("user", user);
-    	
-		return result;
+		return accountService.addUser(user);
 	}
 	
 	/**
@@ -95,7 +95,7 @@ public class AccountController {
 	 * 跳转user页面
 	 */
 	@RequestMapping("/users")
-	//@RequiresRoles(value={"admin", "manager"}, logical=Logical.OR)
+	@RequiresRoles(value={"admin", "manager"}, logical=Logical.OR)
 	public String usersPage(ModelMap modelMap) {
 		
 		modelMap.put("roles", accountService.getRoles());
@@ -124,7 +124,7 @@ public class AccountController {
 	 * @RequiresPermissions (value={"***","***"}, logical= Logical.OR) 
 	 */
 	@RequestMapping("/deleteUser/{userId}")
-	//@RequiresPermissions("deleteUser")
+	@RequiresPermissions("deleteUser")
 	public String deleteUser(@PathVariable("userId") int userId) {
 		accountService.deleteUser(userId);
 		return "redirect:/account/users";

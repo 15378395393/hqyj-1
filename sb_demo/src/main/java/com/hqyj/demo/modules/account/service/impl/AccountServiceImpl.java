@@ -4,6 +4,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,7 @@ import com.hqyj.demo.modules.account.entity.Role;
 import com.hqyj.demo.modules.account.entity.User;
 import com.hqyj.demo.modules.account.service.AccountService;
 import com.hqyj.demo.modules.common.vo.Result;
+import com.hqyj.demo.utils.MD5Util;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -31,6 +35,24 @@ public class AccountServiceImpl implements AccountService {
 	}
 	
 	@Override
+	public Result doLogin(User user) {
+		try {
+			Subject subject = SecurityUtils.getSubject();
+			UsernamePasswordToken usernamePasswordToken = 
+					new UsernamePasswordToken(user.getUserName(), MD5Util.getMD5(user.getPassword()));
+			usernamePasswordToken.setRememberMe(user.getRememberMe());
+			
+			subject.login(usernamePasswordToken);
+			subject.checkRoles();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new Result(500, e.getMessage());
+		}
+		
+		return new Result(200, "success");
+	}
+
+	@Override
 	public User getUserByName(String userName) {
 		return accountDao.getUserByName(userName);
 	}
@@ -47,6 +69,7 @@ public class AccountServiceImpl implements AccountService {
 		}
 		
 		user.setCreateDate(new Date());
+		user.setPassword(MD5Util.getMD5(user.getPassword()));
 		accountDao.addUser(user);
 		
 		return new Result(200, "success", user);
