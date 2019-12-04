@@ -14,7 +14,11 @@
     	<property name="hashIterations" value="2"/>
     </bean> -->
     
-    <!-- 扫描包，@Repository、@Service、@Controller等 -->
+    <!-- 
+    	扫描包，@Repository、@Service、@Controller等
+    	web.xml中，先执行ShiroFilter，它依赖securitymanager、realm，
+    	当realm中有使用server层代码的时候，我们的spring mvc配置还没有加载，所以在此处多扫描一次
+    -->
 	<context:component-scan base-package="com.hqyj.hrms"/>
     
     <!-- 验证器配置 -->

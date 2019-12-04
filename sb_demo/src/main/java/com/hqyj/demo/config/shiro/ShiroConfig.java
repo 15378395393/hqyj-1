@@ -73,7 +73,7 @@ public class ShiroConfig {
 		
 		shiroFilter.setLoginUrl("/account/login");
 		shiroFilter.setSuccessUrl("/account/dashboard");
-//		shiroFilter.setUnauthorizedUrl("/error/403");
+		shiroFilter.setUnauthorizedUrl("/error/403");
 		
 		// 如果登录页面用户名使用的不是userName，则需要添加过滤器，让shiro识别用户名对应的字段
 //		Map<String, Filter> filters = new LinkedHashMap<String, Filter>();
@@ -130,7 +130,7 @@ public class ShiroConfig {
 	}
 	
 	/**
-	 * SimpleCookie
+	 * 记住我之SimpleCookie
 	 */
 	@Bean
 	public SimpleCookie rememberMeCookie() {
@@ -144,7 +144,7 @@ public class ShiroConfig {
 	}
 	
 	/**
-	 * cookie管理器;
+	 * 记住我之cookie管理器
 	 */
 	@Bean
 	public CookieRememberMeManager rememberMeManager() {

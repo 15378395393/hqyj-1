@@ -40,6 +40,8 @@
 	<h3>url,href</h3>
 	<a th:href="@{http://www.baidu.com}" target="_blank">Click it to turn to baidu</a><br>
 	<a th:href="${baiduUrl}" target="_blank">Click it to turn to Shop beauty</a><br>
+	<a th:href="@{'/test/index/'+${city.cityId}}" th:text="${city.cityName}"></a>
+	<a th:href="@{/test/index(pageSize=${city.cityId},currentPage='1')}" th:text="${city.cityName}"></a>
 	<!-- <img th:src="@{${shopLogo}}"/> -->
 	<p>==================================================================</p>
 	
