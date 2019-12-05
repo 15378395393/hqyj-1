@@ -63,7 +63,8 @@ public class ShiroConfig {
 	 * *：匹配零个或多个字符串，如 /admin* 将匹配 /admin 或/admin123，但不匹配 /admin/1
 	 * **：匹配路径中的零个或多个路径，如 /admin/** 将匹配 /admin/a 或 /admin/a/b
 	 * -----------------------
-	 * 方法名不能乱写，如果我们定义为别的名称，又没有添加注册过滤器的配置，那么shiro会加载ShiroWebFilterConfiguration过滤器，
+	 * 方法名不能乱写，如果我们定义为别的名称，又没有添加注册过滤器的配置，
+	 * 那么shiro会加载ShiroWebFilterConfiguration过滤器，
 	 * 该过滤器会寻找shiroFilterFactoryBean，找不到会抛出异常
 	 */
 	@Bean
@@ -136,7 +137,8 @@ public class ShiroConfig {
 	public SimpleCookie rememberMeCookie() {
 	    //这个参数是cookie的名称，对应前端的checkbox的name = rememberMe
 	    SimpleCookie simpleCookie = new SimpleCookie("rememberMe");
-	    //如果httyOnly设置为true，则客户端不会暴露给客户端脚本代码，使用HttpOnly cookie有助于减少某些类型的跨站点脚本攻击；
+	    //如果httyOnly设置为true，则客户端不会暴露给客户端脚本代码，
+	    //使用HttpOnly cookie有助于减少某些类型的跨站点脚本攻击；
 	    simpleCookie.setHttpOnly(true);
 	    //记住我cookie生效时间,单位是秒
 	    simpleCookie.setMaxAge(30 * 24 * 60 * 60);
@@ -161,7 +163,8 @@ public class ShiroConfig {
 	/**
 	 * 1、session 管理，去掉重定向后Url追加SESSIONID
 	 * 2、shiro默认Cookie名称是JSESSIONID，与servlet(jetty, tomcat等默认JSESSIONID)冲突，
-	 * 我们需要为shiro指定一个不同名称的Session id，否则抛出UnknownSessionException: There is no session with id异常
+	 * 我们需要为shiro指定一个不同名称的Session id，否则抛出UnknownSessionException: 
+	 * There is no session with id异常
 	 */
 	@Bean
 	public DefaultWebSessionManager sessionManager() {
