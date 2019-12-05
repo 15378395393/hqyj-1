@@ -2,7 +2,6 @@ package com.hqyj.hrms.config;
 
 import java.util.List;
 
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -12,10 +11,8 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.hqyj.hrms.constant.SystemConstant;
 import com.hqyj.hrms.entity.Resource;
 import com.hqyj.hrms.entity.Role;
 import com.hqyj.hrms.entity.User;
@@ -50,10 +47,6 @@ public class MyRealm extends AuthorizingRealm {
 			return null;
 		}
 		
-		if (userName.equals("admin")) {
-			authorizationInfo.addRole("admin");
-		}
-		
 		// 获取角色信息，配合页面标签，确定不同角色访问不同的资源
 		List<Role> roles = authorityService.getRolesByUserId(user.getUserId());
 		for (Role role : roles) {
@@ -77,9 +70,6 @@ public class MyRealm extends AuthorizingRealm {
 		if (user == null) {
 			throw new UnknownAccountException("The account do not exist.");
 		}
-		
-		Subject subject = SecurityUtils.getSubject();
-		subject.getSession().setAttribute(SystemConstant.USER_KEY, user.getUserId());
 		
 		// realmName: 当前 realm 对象的唯一名字. 调用父类的 getName() 方法
 		return new SimpleAuthenticationInfo(account, user.getPassword(), getName());

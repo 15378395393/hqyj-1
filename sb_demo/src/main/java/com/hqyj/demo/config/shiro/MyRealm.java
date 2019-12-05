@@ -67,6 +67,7 @@ public class MyRealm extends AuthorizingRealm {
 			throw new UnknownAccountException("The account do not exist.");
 		}
 		
+		// realmName: 当前 realm 对象的唯一名字. 调用父类的 getName() 方法
 		return new SimpleAuthenticationInfo(user.getUserName(), user.getPassword(), getName());
 	}
 
