@@ -35,7 +35,7 @@ public class ShiroConfig {
 	private MyRealm myRealm;
 	
 	/**
-	 * 注册securityManager
+	 * --注册securityManager
 	 */
 	@Bean
 	public DefaultWebSecurityManager securityManager () {
@@ -49,9 +49,9 @@ public class ShiroConfig {
 	}
 	
 	/**
-	 * 配置shiro过滤器工厂
+	 * --配置shiro过滤器工厂
 	 * -----------------
-	 * 拦截权限
+	 * --拦截权限
 	 * anon：匿名访问，无需登录
 	 * authc：登录后才能访问
 	 * user：登录过能访问
@@ -63,9 +63,9 @@ public class ShiroConfig {
 	 * *：匹配零个或多个字符串，如 /admin* 将匹配 /admin 或/admin123，但不匹配 /admin/1
 	 * **：匹配路径中的零个或多个路径，如 /admin/** 将匹配 /admin/a 或 /admin/a/b
 	 * -----------------------
-	 * 方法名不能乱写，如果我们定义为别的名称，又没有添加注册过滤器的配置，
-	 * 那么shiro会加载ShiroWebFilterConfiguration过滤器，
-	 * 该过滤器会寻找shiroFilterFactoryBean，找不到会抛出异常
+	 * --方法名不能乱写，如果我们定义为别的名称，又没有添加注册过滤器的配置，
+	 * --那么shiro会加载ShiroWebFilterConfiguration过滤器，
+	 * --该过滤器会寻找shiroFilterFactoryBean，找不到会抛出异常
 	 */
 	@Bean
 	public ShiroFilterFactoryBean shiroFilterFactoryBean() {
@@ -102,7 +102,7 @@ public class ShiroConfig {
 	}
 	
 	/**
-	 * 注册shiro方言，让thymeleaf支持shiro标签
+	 * --注册shiro方言，让thymeleaf支持shiro标签
 	 */
 	@Bean
 	public ShiroDialect shiroDialect(){
@@ -110,7 +110,7 @@ public class ShiroConfig {
 	}
 	
 	/**
-	 * 自动代理类，支持Shiro的注解
+	 * --自动代理类，支持Shiro的注解
 	 */
 	@Bean
 	@DependsOn({"lifecycleBeanPostProcessor"})
@@ -121,7 +121,7 @@ public class ShiroConfig {
 	}
 
     /**
-     * 开启Shiro的注解
+     * --开启Shiro的注解
      */
 	@Bean
 	public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(){
@@ -131,7 +131,7 @@ public class ShiroConfig {
 	}
 	
 	/**
-	 * 记住我之SimpleCookie
+	 * --记住我之SimpleCookie
 	 */
 	@Bean
 	public SimpleCookie rememberMeCookie() {
@@ -146,7 +146,7 @@ public class ShiroConfig {
 	}
 	
 	/**
-	 * 记住我之cookie管理器
+	 * --记住我之cookie管理器
 	 */
 	@Bean
 	public CookieRememberMeManager rememberMeManager() {
@@ -163,7 +163,7 @@ public class ShiroConfig {
 	/**
 	 * 1、session 管理，去掉重定向后Url追加SESSIONID
 	 * 2、shiro默认Cookie名称是JSESSIONID，与servlet(jetty, tomcat等默认JSESSIONID)冲突，
-	 * 我们需要为shiro指定一个不同名称的Session id，否则抛出UnknownSessionException: 
+	 * --我们需要为shiro指定一个不同名称的Session id，否则抛出UnknownSessionException: 
 	 * There is no session with id异常
 	 */
 	@Bean
