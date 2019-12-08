@@ -34,7 +34,7 @@ public class ClientUi extends JFrame {
     // 发送面板
     private JPanel sendPanel = new JPanel();
     // ip输入框
-    public static JTextField desIpTextField = new JTextField("请输入对方Ip");
+    public static JTextField desIpTextField = new JTextField("请输入服务器Ip");
     // 昵称输入框
     public static JTextField nameTextField = new JTextField("请输入昵称");
     // 消息输入框

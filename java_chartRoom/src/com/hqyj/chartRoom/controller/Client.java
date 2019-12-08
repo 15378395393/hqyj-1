@@ -73,10 +73,10 @@ public class Client extends Thread {
 					bw.write(message);
 					bw.newLine();
 					bw.flush();
+					
+					ClientUi.messageTextArea.setText("");
 				} catch (IOException e) {
 					e.printStackTrace();
-				} finally {
-					ChartRoomUtil.closeStream(null, bw, null);
 				}
 			}
 			

@@ -68,8 +68,6 @@ public class ServerTransport extends Thread {
 			ChartRoomUtil.releaseSocket(null, socket);
 			e.printStackTrace();
 			throw new RuntimeException("获取流失败。");
-		} finally {
-			ChartRoomUtil.closeStream(br, ownerBw, destBw);
 		}
 	}
 	
