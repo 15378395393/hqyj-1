@@ -27,8 +27,8 @@ public class FileTest {
 		System.out.println("当前项目根目录:" + System.getProperty("user.dir"));
 		System.out.println("当前classPath路径:" + Thread.currentThread().getContextClassLoader().getResource("").getPath());
 		System.out.println("当前类classPath路径(不包含自己):" + FileTest.class.getResource("").getPath());
-		System.out.println("配置文件路径1：" + FileTest.class.getResource("/test.text").getPath());
-		System.out.println("配置文件路径2：" + FileTest.class.getClassLoader().getResource("test.text").getPath());
+		System.out.println("配置文件路径1：" + FileTest.class.getResource("/test.txt").getPath());
+		System.out.println("配置文件路径2：" + FileTest.class.getClassLoader().getResource("test.txt").getPath());
 		System.out.println("==============");
 	}
 	
@@ -37,7 +37,7 @@ public class FileTest {
 		InputStream is = null;
 		BufferedReader br = null;
 		try {
-			is = new FileInputStream(FileTest.class.getResource("/test.text").getPath());
+			is = new FileInputStream(FileTest.class.getResource("/test.txt").getPath());
 			br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 			StringBuffer sb = new StringBuffer();
 			String line = null;
@@ -71,7 +71,7 @@ public class FileTest {
 		BufferedWriter bw = null;
 		try {
 			// 读取文件
-			is = new FileInputStream(FileTest.class.getResource("/test.text").getPath());
+			is = new FileInputStream(FileTest.class.getResource("/test.txt").getPath());
 			br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 			List<String> contents = new ArrayList<String>();
 			String line = null;
@@ -80,7 +80,7 @@ public class FileTest {
 			}
 			
 			// 写入文件
-			os = new FileOutputStream("/test1.text");
+			os = new FileOutputStream("/test1.txt");
 			bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
 			for (String temp : contents) {
 				bw.write(temp);
