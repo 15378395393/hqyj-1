@@ -9,7 +9,7 @@ import java.net.Socket;
 
 import com.hqyj.chartRoom.ui.ClientUi;
 import com.hqyj.chartRoom.ui.ServerUi;
-import com.hqyj.chartRoom.util.HostUtil;
+import com.hqyj.chartRoom.util.ChartRoomUtil;
 
 /**
  * @Description: 聊天室客户端，向服务器发送信息，接受服务器返回的信息
@@ -39,11 +39,13 @@ public class Client extends Thread {
 			String line = null;
 			while ((line = br.readLine()) != null) {
 				System.out.println("----------" + line);
-				ClientUi.chartTextArea.append(line + HostUtil.NEW_LINE);
+				ClientUi.chartTextArea.append(line + ChartRoomUtil.NEW_LINE);
 			}
 		} catch (NumberFormatException | IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("连接失败！");
+		} finally {
+			ChartRoomUtil.closeStream(br, null, null);
 		}
 	}
 	
@@ -63,7 +65,7 @@ public class Client extends Thread {
 					bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 					
 					// 获取用户输入的聊天内容
-					String message = ClientUi.desIpTextField.getText().trim() + HostUtil.SPLIT_CHAR 
+					String message = ClientUi.desIpTextField.getText().trim() + ChartRoomUtil.SPLIT_CHAR 
 							+ ClientUi.nameTextField.getText().trim() + ": " 
 							+ ClientUi.messageTextArea.getText().trim();
 					
@@ -73,6 +75,8 @@ public class Client extends Thread {
 					bw.flush();
 				} catch (IOException e) {
 					e.printStackTrace();
+				} finally {
+					ChartRoomUtil.closeStream(null, bw, null);
 				}
 			}
 			

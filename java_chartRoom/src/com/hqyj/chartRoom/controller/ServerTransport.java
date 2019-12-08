@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
-import com.hqyj.chartRoom.util.HostUtil;
+import com.hqyj.chartRoom.util.ChartRoomUtil;
 
 /**
  * @Description: 客户端和服务器建立socket连接后，服务器接收到多个socket，并对之进行处理
@@ -28,13 +28,14 @@ public class ServerTransport extends Thread {
 	public void run() {
 		BufferedReader br = null;
 		BufferedWriter ownerBw = null;
+		BufferedWriter destBw = null;
 		try {
 			br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			ownerBw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 			
 			String lineMessage = null;
 			while ((lineMessage = br.readLine()) != null) {
-				String[] temps = lineMessage.split(HostUtil.SPLIT_CHAR);
+				String[] temps = lineMessage.split(ChartRoomUtil.SPLIT_CHAR);
 				if (temps.length <= 1) {
 					ownerBw.write("数据格式错误。");
 					ownerBw.newLine();
@@ -44,7 +45,6 @@ public class ServerTransport extends Thread {
 				String destIp = temps[0];
 				String content = temps[1];
 				boolean isOnline = false;
-				BufferedWriter destBw = null;
 				for (ServerTransport serverTransport : Server.serverTransports) {
 					if (destIp.equals(serverTransport.clientIp)) {
 						destBw = new BufferedWriter(
@@ -65,8 +65,11 @@ public class ServerTransport extends Thread {
 			}
 		} catch (IOException e) {
 			Server.serverTransports.remove(this);
+			ChartRoomUtil.releaseSocket(null, socket);
 			e.printStackTrace();
 			throw new RuntimeException("获取流失败。");
+		} finally {
+			ChartRoomUtil.closeStream(br, ownerBw, destBw);
 		}
 	}
 	

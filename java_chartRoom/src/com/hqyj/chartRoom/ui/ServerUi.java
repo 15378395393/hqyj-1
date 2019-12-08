@@ -13,7 +13,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import com.hqyj.chartRoom.controller.Server;
-import com.hqyj.chartRoom.util.HostUtil;
+import com.hqyj.chartRoom.util.ChartRoomUtil;
 
 /**
  * @Description: 聊天室服务端界面
@@ -29,11 +29,11 @@ public class ServerUi extends JFrame {
 	
 	// 服务器ip
 	private JLabel ipLabel = new JLabel("服务器ip:");
-    public static JTextField ipTextField = new JTextField(HostUtil.getIp());
+    public static JTextField ipTextField = new JTextField(ChartRoomUtil.getIp());
     
     // 服务器端口
     private JLabel portLabel = new JLabel("服务器端口:");
-    public static JTextField portTextField = new JTextField(HostUtil.PORT + "");
+    public static JTextField portTextField = new JTextField(ChartRoomUtil.PORT + "");
     
     // 启动按钮
     public static JButton startButton = new JButton("启动服务器");
