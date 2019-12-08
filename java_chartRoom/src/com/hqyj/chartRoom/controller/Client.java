@@ -29,8 +29,8 @@ public class Client extends Thread {
 			System.out.println("接收服务器信息……");
 			
 			// 根据ip和端口初始化socket
-			socket = new Socket(ServerUi.ipTextField.getText().trim().toLowerCase(), 
-					Integer.parseInt(ServerUi.portTextField.getText().trim()));
+			socket = new Socket(ClientUi.desIpTextField.getText().trim().toLowerCase(), 
+					Integer.parseInt(ClientUi.desPortTextField.getText().trim()));
 			
 			// 从socket中获取输入流，装载到bufferedReader中
 			br = new BufferedReader(new InputStreamReader(socket.getInputStream()));

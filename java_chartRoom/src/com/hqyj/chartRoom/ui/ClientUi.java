@@ -23,6 +23,9 @@ import com.hqyj.chartRoom.controller.Client;
 public class ClientUi extends JFrame {
 	
 	private static final long serialVersionUID = -2862033822313415513L;
+	
+	// 定义client
+	Client client = null;
 
 	// 总面板
 	private JPanel clientPanel = new JPanel();
@@ -31,10 +34,17 @@ public class ClientUi extends JFrame {
 	public static JTextArea chartTextArea = new JTextArea();
     private JScrollPane chatScrollPane = new JScrollPane(chartTextArea);
     
+    // ip and port面板
+    private JPanel ipAndPortPanel = new JPanel();
+    // ip输入框
+    public static JTextField desIpTextField = new JTextField("服务器Ip");
+    // port输入框
+    public static JTextField desPortTextField = new JTextField("服务器Port");
+    // 连接按钮
+    private JButton connectButton = new JButton("连接");
+    
     // 发送面板
     private JPanel sendPanel = new JPanel();
-    // ip输入框
-    public static JTextField desIpTextField = new JTextField("请输入服务器Ip");
     // 昵称输入框
     public static JTextField nameTextField = new JTextField("请输入昵称");
     // 消息输入框
@@ -55,14 +65,23 @@ public class ClientUi extends JFrame {
 		// 总面板 组装 聊天窗口面板
 		clientPanel.add(chatScrollPane);
 		
+		// 设置连接按钮
+		desIpTextField.setPreferredSize(new Dimension(80, 30));
+		desPortTextField.setPreferredSize(new Dimension(80, 30));
+		connectButton.setPreferredSize(new Dimension(100, 30));
+		ipAndPortPanel.add(desIpTextField);
+		ipAndPortPanel.add(desPortTextField);
+		ipAndPortPanel.add(connectButton);
+		// 总面板 组装 发送面板
+		clientPanel.add(ipAndPortPanel);
+		
 		// 设置 发送面板 组件属性
 		messageTextArea.setLineWrap(true);
-		desIpTextField.setPreferredSize(new Dimension(80, 30));
 		nameTextField.setPreferredSize(new Dimension(60, 30));
 		messageScrollPane.setPreferredSize(new Dimension(250, 30));
 		sendButton.setPreferredSize(new Dimension(100, 30));
+		sendButton.setEnabled(false);
 		// 发送面板 组装 各类组件
-		sendPanel.add(desIpTextField);
 		sendPanel.add(nameTextField);
 		sendPanel.add(messageScrollPane);
 		sendPanel.add(sendButton);
@@ -73,7 +92,7 @@ public class ClientUi extends JFrame {
 		// 设置窗体标题
 		this.setTitle("群聊窗口");
 		// 设置总面板x、y坐标和长宽
-		this.setBounds(300, 100, 600, 500);
+		this.setBounds(300, 100, 600, 600);
 		// 是否可由用户调整窗体大小
 		this.setResizable(false);
 		// 用户点击close关闭窗体
@@ -81,10 +100,6 @@ public class ClientUi extends JFrame {
 		this.add(clientPanel);
 		// 设置容器是否可见，注意，该方法只能放在最后，且一个类中只调用一次
 		this.setVisible(true);
-		
-		// 启动客户端线程
-		Client client = new Client();
-		client.start();
 		
 		// 绑定ip输入框焦点事件
 		desIpTextField.addFocusListener(new FocusListener() {
@@ -95,6 +110,17 @@ public class ClientUi extends JFrame {
 			@Override
 			public void focusGained(FocusEvent e) {
 				desIpTextField.setText("");
+			}
+		});
+		
+		desPortTextField.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost(FocusEvent e) {
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				desPortTextField.setText("");
 			}
 		});
 		
@@ -110,6 +136,15 @@ public class ClientUi extends JFrame {
 			}
 		});
 		
+		// 绑定连接按钮事件
+		connectButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				client = new Client();
+				client.start();
+				sendButton.setEnabled(true);
+			}
+		});
 		
 		// 绑定发送按钮监听器
 		sendButton.addActionListener(new ActionListener() {

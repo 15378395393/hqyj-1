@@ -15,7 +15,7 @@ public class Server extends Thread {
 	
 	@Override
 	public void run() {
-		System.out.println("起送服务器……");
+		System.out.println("启动服务器……");
 		try {
 			// 创建server Socket
 			serverSocket = new ServerSocket(Integer.parseInt(ServerUi.portTextField.getText().trim()));
