@@ -46,14 +46,15 @@ public class ServerTransport extends Thread {
 				String content = temps[1];
 				boolean isOnline = false;
 				for (ServerTransport serverTransport : Server.serverTransports) {
-					if (destIp.equals(serverTransport.clientIp)) {
-						destBw = new BufferedWriter(
-								new OutputStreamWriter(serverTransport.socket.getOutputStream()));
-						destBw.write(content);
-						destBw.newLine();
-						destBw.flush();
-						isOnline = true;
-					}
+					destBw = new BufferedWriter(
+							new OutputStreamWriter(serverTransport.socket.getOutputStream()));
+					destBw.write(content);
+					destBw.newLine();
+					destBw.flush();
+					isOnline = true;
+					// 点对点发送消息，判断ip是否匹配
+//					if (destIp.equals(serverTransport.clientIp)) {
+//					}
 				}
 				
 				if (!isOnline) {
