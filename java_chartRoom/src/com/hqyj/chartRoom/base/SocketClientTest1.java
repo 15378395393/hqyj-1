@@ -64,14 +64,18 @@ public class SocketClientTest1 {
 		// serverSocket没有关闭，可以一直从serverSocket得到socket
 		while (true) {
 			try {
+				// 从serverSocket中获取socket，取出服务器端传递的信息
 				socketIn = serverSocket.accept();
 				br = new BufferedReader(new InputStreamReader(socketIn.getInputStream()));
 				String messageIn = br.readLine();
 				System.out.println("服务器：" + messageIn);
 				
+				// 客户端输入新的信息
 				System.out.print("客户端：");
 				scanner = new Scanner(System.in);
 				messageOut = scanner.next();
+				
+				// 连接服务器端，建立socket通道，传递客户端消息
 				socketOut = new Socket("localhost", 9090);
 				bw = new BufferedWriter(new OutputStreamWriter(socketOut.getOutputStream()));
 				bw.write(messageOut);

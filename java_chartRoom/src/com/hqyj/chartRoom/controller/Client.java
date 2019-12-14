@@ -8,7 +8,6 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 import com.hqyj.chartRoom.ui.ClientUi;
-import com.hqyj.chartRoom.ui.ServerUi;
 import com.hqyj.chartRoom.util.ChartRoomUtil;
 
 /**
@@ -82,6 +81,7 @@ public class Client extends Thread {
 			
 		};
 		
+		// 开启接收消息线程
 		sendThread.start();
 	}
 	

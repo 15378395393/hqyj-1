@@ -9,8 +9,15 @@ import java.util.List;
 import com.hqyj.chartRoom.ui.ServerUi;
 import com.hqyj.chartRoom.util.ChartRoomUtil;
 
+/**
+ * 聊天室服务器端，建立serverSocket监听，
+ * 接收每个客户端传递的socket，并将消息返回到每个客户端面板
+ * @author: HymanHu
+ * @date: 2019年12月13日
+ */
 public class Server extends Thread {
 	private ServerSocket serverSocket;
+	// 服务端将所有接收到的socket封装到list中
 	public static List<ServerTransport> serverTransports = new ArrayList<ServerTransport>();
 	
 	@Override
@@ -44,6 +51,7 @@ public class Server extends Thread {
 	public void acceptMessage () {
 		System.out.println("接受客户端信息，并返回给客户端……");
 		
+		// 我们为每一个客户端传递的socket开启一个线程
 		Thread acceptThread = new Thread() {
 
 			private Socket socket;
@@ -83,6 +91,7 @@ public class Server extends Thread {
 			
 		};
 		
+		// 开启接收消息线程
 		acceptThread.start();
 	}
 
