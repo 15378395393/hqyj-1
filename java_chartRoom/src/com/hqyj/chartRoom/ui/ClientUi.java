@@ -1,13 +1,18 @@
 package com.hqyj.chartRoom.ui;
 
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -28,7 +33,15 @@ public class ClientUi extends JFrame {
 	Client client = null;
 
 	// 总面板
-	private JPanel clientPanel = new JPanel();
+	private JPanel clientPanel = new JPanel() {
+		@Override
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			// 背景图
+			ImageIcon img = new ImageIcon(ClientUi.class.getResource("/20191214230645.png"));  
+			((Icon) img).paintIcon(this, g, 0, 0); 
+		}
+	};
 	
 	// 聊天窗口面板
 	public static JTextArea chartTextArea = new JTextArea();
@@ -60,8 +73,13 @@ public class ClientUi extends JFrame {
 		chartTextArea.setLineWrap(true);
 		// 不能编辑
 		chartTextArea.setEditable(false);
+		//设置透明度
+		chartTextArea.setOpaque(false);
 		// 设置最好的大小，根据界面整体的变化而变化
 		chatScrollPane.setPreferredSize(new Dimension(550, 400));
+		//设置透明度
+		chatScrollPane.setOpaque(false);
+		chatScrollPane.getViewport().setOpaque(false);
 		// 总面板 组装 聊天窗口面板
 		clientPanel.add(chatScrollPane);
 		
@@ -72,6 +90,8 @@ public class ClientUi extends JFrame {
 		ipAndPortPanel.add(desIpTextField);
 		ipAndPortPanel.add(desPortTextField);
 		ipAndPortPanel.add(connectButton);
+		//设置透明度
+		ipAndPortPanel.setOpaque(false);
 		// 总面板 组装 发送面板
 		clientPanel.add(ipAndPortPanel);
 		
@@ -85,6 +105,8 @@ public class ClientUi extends JFrame {
 		sendPanel.add(nameTextField);
 		sendPanel.add(messageScrollPane);
 		sendPanel.add(sendButton);
+		//设置透明度
+		sendPanel.setOpaque(false);
 		// 总面板 组装 发送面板
 		clientPanel.add(sendPanel);
 		
@@ -151,6 +173,10 @@ public class ClientUi extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				client.sendMessage();
+				// 如果用户输入“bye”则关闭client面板
+				if ("bye".equals(ClientUi.messageTextArea.getText().trim())) {
+					dispose();
+				}
 			}
 		});
     }
