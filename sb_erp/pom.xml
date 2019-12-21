@@ -4,6 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.hqyj</groupId>
 	<artifactId>sb_erp</artifactId>
+	<packaging>war</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>sb_erp</name>
 	<description>Demo project for Spring Boot</description>
@@ -11,6 +12,7 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+		<failOnMissingWebXml>false</failOnMissingWebXml>
 	</properties>
 	
 	<parent>
@@ -34,6 +36,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		
+		<!-- tomCat -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-tomcat</artifactId>
+		    <scope>provided</scope>
 		</dependency>
 		
 		<!-- mysql -->
@@ -88,6 +97,8 @@
 	</dependencies>
 
 	<build>
+		<finalName>sb_erp</finalName>
+		
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

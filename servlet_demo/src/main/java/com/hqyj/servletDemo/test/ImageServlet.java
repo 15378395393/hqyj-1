@@ -17,14 +17,14 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class TestForImage
  */
-@WebServlet("/testForImage")
-public class TestForImage extends HttpServlet {
+@WebServlet("/imageServlet")
+public class ImageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public TestForImage() {
+    public ImageServlet() {
         super();
     }
 

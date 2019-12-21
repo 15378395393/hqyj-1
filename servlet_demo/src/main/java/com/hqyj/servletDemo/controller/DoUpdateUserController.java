@@ -15,7 +15,7 @@ import com.hqyj.servletDemo.entity.User;
 /**
  * Servlet implementation class DoUpdateUser
  */
-@WebServlet("/DoUpdateUserController")
+@WebServlet("/doUpdateUser")
 public class DoUpdateUserController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

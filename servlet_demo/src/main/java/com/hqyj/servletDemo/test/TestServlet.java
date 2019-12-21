@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class TestServlet
  */
-@WebServlet("/TestServlet")
+@WebServlet("/test")
 public class TestServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -59,7 +60,17 @@ public class TestServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		System.out.println("Call get method.");
 		
+		Cookie[] cookies = request.getCookies();
+		for (Cookie cookie : cookies) {
+			System.out.println(cookie.getName() + "------" + cookie.getValue());
+		}
+		
+		Cookie cookie = new Cookie("testCookie", "HymanHu");
+		cookie.setMaxAge(24*60*60);
+		response.addCookie(cookie);
+		
 		response.setContentType("text/html");
+		response.setStatus(response.SC_OK);
 		PrintWriter pw = response.getWriter();
 		pw.append("<html>");
 		pw.append("<head>");

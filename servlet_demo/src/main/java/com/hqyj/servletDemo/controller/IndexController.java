@@ -12,7 +12,7 @@ import com.hqyj.servletDemo.entity.User;
 /**
  * Servlet implementation class IndexController
  */
-@WebServlet("/IndexController")
+@WebServlet("/index")
 public class IndexController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

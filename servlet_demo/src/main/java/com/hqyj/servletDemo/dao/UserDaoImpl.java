@@ -108,6 +108,11 @@ public class UserDaoImpl {
 		String sql = "insert into m_user (user_name, password, create_date) values (?, ?, ?)";
 		
 		try {
+			/*
+			 * 从5.1.17版本之后的mysql-connector增加了返回GeneratedKeys的条件，
+			 * 如果需要返回GeneratedKeys，则PreparedStatement需要显示添加一个参数
+			 * PreparedStatement.RETURN_GENERATED_KEYS
+			 */
 			PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, user.getUserName());
 			ps.setString(2, user.getPassword());

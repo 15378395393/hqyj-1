@@ -13,7 +13,7 @@ import com.hqyj.servletDemo.entity.User;
 /**
  * Servlet implementation class DeleteUserController
  */
-@WebServlet("/DeleteUserController")
+@WebServlet("/deleteUser")
 public class DeleteUserController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

@@ -17,7 +17,7 @@ import com.hqyj.servletDemo.entity.User;
 /**
  * Servlet implementation class DoRegisterController
  */
-@WebServlet("/DoRegisterController")
+@WebServlet("/doRegister")
 public class DoRegisterController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

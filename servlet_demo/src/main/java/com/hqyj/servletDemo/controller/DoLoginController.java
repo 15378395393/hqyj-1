@@ -15,7 +15,7 @@ import com.hqyj.servletDemo.entity.User;
 /**
  * Servlet implementation class DoLoginController
  */
-@WebServlet("/DoLoginController")
+@WebServlet("/doLogin")
 public class DoLoginController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
