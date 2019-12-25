@@ -1,5 +1,6 @@
 package com.hqyj.demo.modules.account.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -10,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
+
 /**
  * 用户类
  * @author: HymanHu
@@ -17,12 +20,19 @@ import javax.persistence.Transient;
  */
 @Entity
 @Table(name="m_user")
-public class User {
+public class User implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Excel(name = "Id", orderNum = "0", width = 15)
 	private int userId;
+	@Excel(name = "用户名", orderNum = "1", width = 15)
 	private String userName;
+	@Excel(name = "密码", orderNum = "2", width = 15)
 	private String password;
+	// format: exportFormat and importFormat
+	@Excel(name = "创建时间", orderNum = "3", width = 15, format = "yyyy-MM-dd")
 	private Date createDate;
 	
 	@Transient

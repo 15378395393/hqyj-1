@@ -94,6 +94,13 @@
 		    <artifactId>commons-lang3</artifactId>
 		</dependency>
 		
+		<!-- easypoi for excel export -->
+		<dependency>
+			<groupId>cn.afterturn</groupId>
+			<artifactId>easypoi-spring-boot-starter</artifactId>
+			<version>3.3.0</version>
+		</dependency>
+		
 	</dependencies>
 
 	<build>
