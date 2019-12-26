@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskConfiguration>
+
+	<property key="maxRetry" value="3" />
+
+	<zookeeper>
+		<host>172.17.20.136</host>
+		<rootConfigNode>/rs-chenhua</rootConfigNode>
+		<sessionTimeout>120000</sessionTimeout>
+		<connectionTimeout>120000</connectionTimeout>
+	</zookeeper>
+
+	<scheduledTasks>
+		<deleteRemoved>
+			<delay>168</delay>
+		</deleteRemoved>
+		<deleteArchived>
+			<delay>168</delay>
+		</deleteArchived>
+	</scheduledTasks>
+
+	<sqlCluster>
+		<property key="defaultAutoCommit" value="true" />
+		<property key="defaultTransactionIsolation" value="true" />
+		<property key="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property key="validationQuery" value="select 2" />
+		<property key="testOnBorrow" value="true" />
+	</sqlCluster>
+
+</taskConfiguration>
