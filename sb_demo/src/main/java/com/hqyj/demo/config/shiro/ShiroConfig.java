@@ -93,6 +93,7 @@ public class ShiroConfig {
 		map.put("/account/doRegister", "anon");
 		map.put("/excel/**", "anon");
 		map.put("/test/**", "anon");
+		map.put("/actuator/**", "anon");
 		
 		// 如果使用“记住我功能”，则采用user规则，如果必须要用户登录，则采用authc规则
 //		map.put("/**", "authc");
