@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hqyj.demo.config.dataSource.aopImpl.DataSourceAnnotation;
 import com.hqyj.demo.modules.test.dao.TestDao;
 import com.hqyj.demo.modules.test.entity.City;
 import com.hqyj.demo.modules.test.entity.Country;
@@ -29,6 +30,7 @@ public class TestServiceImpl implements TestService {
 	}
 
 	@Override
+	@DataSourceAnnotation("testDb")
 	public Country getcountryByCountryId(int countryId) {
 		return testDao.getcountryByCountryId(countryId);
 	}

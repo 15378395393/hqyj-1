@@ -7,13 +7,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 数据源注解
+ * @Description: 数据源注解
  * @author: HymanHu
- * @date: 2020年1月10日
+ * @date: 2020年1月11日
  */
 @Target(ElementType.METHOD)
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DataSourceAnnotation {
-	String value() default "test";
+	String value() default "maindb";
 }

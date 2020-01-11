@@ -43,6 +43,10 @@ public class MyRealm extends AuthorizingRealm {
 			return null;
 		}
 		
+		if (user.getUserName().equals("admin")) {
+			authorizationInfo.addRole("admin");
+		}
+		
 		List<Role> roles = accountService.getRolesByUserId(user.getUserId());
 		for (Role role : roles) {
 			authorizationInfo.addRole(role.getRoleName());
@@ -60,7 +64,8 @@ public class MyRealm extends AuthorizingRealm {
 	 * 通过登录框输入的用户名和密码与验证器做比对，实现身份验证功能
 	 */
 	@Override
-	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) 
+			throws AuthenticationException {
 		String userName = (String) token.getPrincipal();
 		User user = accountService.getUserByName(userName);
 		if (user == null) {

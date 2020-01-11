@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Data Source Holder ---- 采用ThreadLocal工具类，设置数据源、获取数据源、清除数据源
+ * Data Source Holder ---- 采用 ThreadLocal工具类，设置数据源、获取数据源、清除数据源
  * @author: HymanHu
  * @date: 2020年1月10日
  */
@@ -15,11 +15,9 @@ public class DataSourceHolder {
 	// 使用ThreadLocal实现线程安全，创建副本各不干扰
 	private final static ThreadLocal<String> DATA_SOURCE_HOLDER = new ThreadLocal<>();
 	
-	/**
-	 * 配置不同的数据源名称
-	 */
+	// 配置不同的数据源名称
 	public enum DataSource {
-		testDb, erpDb
+		mainDb, testDb
 	}
 	
 	// 设置数据源
@@ -31,7 +29,7 @@ public class DataSourceHolder {
 	// 获取数据源
 	public static String getDataSource() {
 		return StringUtils.isBlank(DATA_SOURCE_HOLDER.get()) ? 
-				DataSource.testDb.toString() : DATA_SOURCE_HOLDER.get();
+				DataSource.mainDb.toString() : DATA_SOURCE_HOLDER.get();
 	}
 	
 	// 清除数据源

@@ -11,6 +11,11 @@ import org.springframework.stereotype.Component;
 import com.hqyj.demo.config.dataSource.aopImpl.DataSourceAnnotation;
 import com.hqyj.demo.config.dataSource.aopImpl.DataSourceHolder;
 
+/**
+ * @Description: 动态数据源切面程序，绑定自定义注解
+ * @author: HymanHu
+ * @date: 2020年1月11日
+ */
 @Aspect
 @Component
 @Order(1)

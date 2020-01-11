@@ -13,6 +13,8 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
@@ -29,6 +31,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+/**
+ * @Description: Data Source Config
+ * @author: HymanHu
+ * @date: 2020年1月11日
+ */
 @Configuration
 @EnableTransactionManagement
 //for mybatis
@@ -79,8 +86,8 @@ public class DataSourceConfig {
 	 * test db config
 	 */
 	@Primary
-	@Bean(name="testDb")
-	@ConfigurationProperties(prefix = "spring.datasource.test")
+	@Bean(name="mainDb")
+	@ConfigurationProperties(prefix = "spring.datasource.main")
 	public HikariDataSource getMainDataSource() {
 		return initHikariDataSource();
 //		return DataSourceBuilder.create().build();
@@ -89,9 +96,9 @@ public class DataSourceConfig {
 	/**
 	 * erp db config
 	 */
-	@Bean(name="erpDb")
-	@ConfigurationProperties(prefix = "spring.datasource.erp")
-	public HikariDataSource getWorldDataSource() {
+	@Bean(name="testDb")
+	@ConfigurationProperties(prefix = "spring.datasource.test")
+	public HikariDataSource getTestDataSource() {
 		return initHikariDataSource();
 //		return DataSourceBuilder.create().build();
 	}
@@ -101,15 +108,15 @@ public class DataSourceConfig {
 	 */
 	@Bean(name="dynamicDataSource")
 	public DataSource getDynamicDataSource(
-			@Qualifier("testDb") DataSource testDb, 
-			@Qualifier("erpDb") DataSource erpDb) {
+			@Qualifier("mainDb") DataSource mainDb, 
+			@Qualifier("testDb") DataSource testDb) {
 		Map<Object, Object> dataSourceMap = new HashMap<Object, Object>();
+		dataSourceMap.put(DataSourceHolder.DataSource.mainDb.toString(), mainDb);
 		dataSourceMap.put(DataSourceHolder.DataSource.testDb.toString(), testDb);
-		dataSourceMap.put(DataSourceHolder.DataSource.erpDb.toString(), erpDb);
 		
 		DataSourceRouting dataSourceRouting = new DataSourceRouting();
 		dataSourceRouting.setTargetDataSources(dataSourceMap);
-		dataSourceRouting.setDefaultTargetDataSource(testDb);
+		dataSourceRouting.setDefaultTargetDataSource(mainDb);
 		
 		return dataSourceRouting;
 	}
@@ -152,14 +159,20 @@ public class DataSourceConfig {
 	 */
 	@Autowired(required=false)
     private JpaProperties jpaProperties;
+	@Autowired
+	private HibernateProperties hibernateProperties;
 	
 	@Bean(name = "entityManagerFactory")
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
 			EntityManagerFactoryBuilder builder, 
 			@Qualifier("dynamicDataSource") DataSource dynamicDataSource) {
+		// spring.jpa.hibernate 相关的配置，jpaProperties 无法获取
+		// 所以采用 hibernateProperties 结合 jpaProperties 的方式
 		return builder
 				.dataSource(dynamicDataSource)
-				.properties(jpaProperties.getProperties())
+//				.properties(jpaProperties.getProperties())
+				.properties(hibernateProperties.determineHibernateProperties(
+						jpaProperties.getProperties(), new HibernateSettings()))
 				.packages("com.hqyj.demo.modules.*.entity")
 				.build();
 	}
