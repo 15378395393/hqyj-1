@@ -104,3 +104,23 @@ print("tuple: %s, length: %d" %(tuple, len(tuple)));
 tuple = (1, ["cdsa", "cdsa"]);
 tuple[1][0] = "aaaa";
 print("tuple: %s, length: %d" %(tuple, len(tuple)));
+
+a = 20;
+if a > 6:
+    print("aaaaaaaaa");
+    print("bbbbbbbb");
+elif a > 18:
+    print("ccccccc");
+else:
+    print("ddddddddd");
+
+a = input("birthday:")
+# 注意输入类型为String，需要转化，如果输入字母，则报错
+b = int(a);
+if b > 2000:
+    print("00+");
+else:
+    print("00-");
+
+a = ["cdsa", "vdsadsa", "ffdsadsa"];
+for temp in a
