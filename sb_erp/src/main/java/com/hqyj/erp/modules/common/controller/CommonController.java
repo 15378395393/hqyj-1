@@ -117,6 +117,8 @@ public class CommonController {
 		modelMap.addAttribute("loacalUrl", loacalUrl);
 		modelMap.addAttribute("template", "common/wellcome");
 		
+		request.getSession().setAttribute("userObject", user);
+		
 		return "index";
 	}
 }

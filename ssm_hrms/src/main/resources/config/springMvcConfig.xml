@@ -32,4 +32,6 @@
 		<property name="securityManager" ref="securityManager" />
 	</bean>
 	
+	<!-- <mvc:resources location="/WEB-INF/upload/" mapping="/WEB-INF/upload/**"></mvc:resources> -->
+	
 </beans>

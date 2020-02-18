@@ -1,0 +1,5 @@
+# for port
+server.port=443
+server.other.port=80
+Hello world
+Hello world!
