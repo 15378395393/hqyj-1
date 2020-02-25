@@ -1,5 +1,6 @@
 # input and output
 import math;
+import urllib
 from collections.abc import Iterable;
 from collections.abc import Iterator;
 from functools import reduce;
@@ -101,13 +102,13 @@ L.pop();
 L.pop(1);
 L[1] = "sssss";
 print(L);
-tuple = ("cdsa", "fdsa");
-print("tuple: %s, length: %d" %(tuple, len(tuple)));
-tuple = (1,);
-print("tuple: %s, length: %d" %(tuple, len(tuple)));
-tuple = (1, ["cdsa", "cdsa"]);
-tuple[1][0] = "aaaa";
-print("tuple: %s, length: %d" %(tuple, len(tuple)));
+t = ("cdsa", "fdsa");
+print("tuple: %s, length: %d" % (t, len(t)));
+t = (1,);
+print("tuple: %s, length: %d" % (t, len(t)));
+t = (1, ["cdsa", "cdsa"]);
+t[1][0] = "aaaa";
+print("tuple: %s, length: %d" % (t, len(t)));
 
 a = 20;
 if a > 6:
@@ -546,7 +547,7 @@ print(",".join(map(str, l)));
 
 def f(n):
     return str(n)==str(n)[::-1]
-print(list(filter(f,range(1,100))));
+print(list(filter(f, range(1, 100))));
 print(list(filter(lambda x : str(x) == str(x)[::-1], range(1, 100))));
 
 def f(n):
@@ -554,7 +555,7 @@ def f(n):
     for item in str(n):
         l.insert(0, item);
     return "".join(l) == str(n);
-print(list(filter(f, range(1,100))));
+print(list(filter(f, range(1, 100))));
 
 def fn(n):
     return str(n) == reduce(lambda x, y : y + x, str(n));
@@ -748,7 +749,7 @@ print(type(lambda x : x + 1) == types.LambdaType);
 print(type((x for x in range(1, 10))) == types.GeneratorType);
 
 print(isinstance("dsac", str));
-print(isinstance([1, 2], (list, tuple))); # 还能用几个候选项用于判断
+print(isinstance([1, 2], (list, t))); # 还能用几个候选项用于判断
 print(isinstance(run, types.FunctionType));
 print(isinstance(dog, Animal));
 
@@ -1198,12 +1199,12 @@ print(os.path.dirname(os.path.dirname(__file__)));
 print(sys.path);
 
 # 读取全部，read(size)按照字符长度读写
-f = open("D:\\projectCode\\hqyj\python_demo\\resource\\test.txt", "r", encoding = "utf-8");
+f = open("D:\\projectCode\\hqyj\python_demo\\resource\\test.txt", "r", encoding ="utf-8");
 text = f.read();
 print(text);
 f.close();
 # 读取到list中
-f = open("D:\\projectCode\\hqyj\python_demo\\resource\\test.txt", "r", encoding = "utf-8");
+f = open("D:\\projectCode\\hqyj\python_demo\\resource\\test.txt", "r", encoding ="utf-8");
 lines = f.readlines();
 print(lines); # 注意除开最后一行，其余每行都有\n换行符
 for line in lines:
@@ -1211,7 +1212,7 @@ for line in lines:
 f.close();
 # 读取文件捕获IO异常
 try:
-    f = open("D:\\projectCode\\hqyj\python_demo\\resource\\test.txt", "r", encoding = "utf-8");
+    f = open("D:\\projectCode\\hqyj\python_demo\\resource\\test.txt", "r", encoding ="utf-8");
     print(f.readlines());
 except IOError as e:
     print(e);
@@ -1248,7 +1249,8 @@ print(os.name); # 操作系统，nt(Windows)、posix(Linux、Unix、Mac OS X)
 print(os.environ); # 获取操作系统环境变量
 print(os.environ.get("CLASSPATH")); # 获取环境变量中某个值
 print(os.path.abspath(".")); # 查看当前目录绝对路径
-#
+print(os.path.isfile(".")); # 判断是否为文件
+print(os.path.isdir(".")); # 判断是否为文件夹
 ''''
 join ---- 文件目录组装
 split ---- 文件目录拆分成tuple，最后一个元素是最后级别的目录或文件夹
@@ -1257,12 +1259,801 @@ why ---- 可以正确处理不同操作系统的分隔符，只是对字符串�
 print(os.path.join("D:/", "testDir"));
 print(os.path.split("D:\\projectCode\\hqyj\\python_demo\\com\\thornBird\\base"));
 print(os.path.splitext("D:\\sql\\testdb.sql")) # 拆分文件全路径，可以得到文件后缀
+print(os.listdir(".")); # 文件夹下所有的文件和目录
+print(os.listdir(os.path.split(os.path.abspath("."))[0])); # 查找当前目录同级文件和目录，包含自己
 if not os.path.exists("D:/testDir"):
     os.mkdir("D:/testDir"); # 创建文件夹
-if not os.path.exists("D:/testDir/test.txt"):
-    os.mknod("test.txt");
-f = open("D:/testDir/test.txt");
-f.write("Hello world");
-f.close();
-
 # os.rmdir("D:/testDir"); # 删除文件夹
+if not os.path.exists("D:/testDir/test.txt"):
+    # os.mknod("test.txt"); # Windows不支持mknod
+    with open("D:/testDir/test.txt", "a", encoding="utf-8") as f:
+        f.write("\nHello world\n");
+# os.rename("D:/testDir/test.txt", "D:/testDir/test1.txt"); # 文件重命名
+# os.remove("D:/testDir/test1.txt"); # 删除文件
+
+print([x for x in os.listdir(".")]); # 打印出当前目录下所有文件和目录
+print([x for x in os.listdir(".") if os.path.isfile(x)]); # 打印出当前目录下所有文件
+print([x for x in os.listdir(".") if os.path.isfile(x) and os.path.splitext(x)[1] == ".py"]) # 打印当前目录py文件
+
+def dirList(dir):
+    dir = os.path.abspath(dir);
+    for x in os.listdir(dir):
+        sonDir = os.path.join(dir, x);
+        if os.path.isdir(sonDir):
+            dirList(sonDir);
+        else:
+            print(sonDir);
+dirList(".");
+print("-----------------------------");
+dirList("D:\\projectCode\\hqyj\\python_demo\\com");
+print(os.path.isdir("D:\\projectCode\\hqyj\\python_demo\\com\\thornBird"));
+
+def fileSearch(dir, keyWord):
+    dir = os.path.abspath(dir);
+    for item in os.listdir(dir):
+        sonDir = os.path.join(dir, item);
+        if os.path.isdir(sonDir):
+            fileSearch(sonDir, keyWord);
+        else:
+            if item.find(keyWord) != -1:
+                print(sonDir);
+fileSearch("D:\\projectCode\\hqyj\\python_demo\\com", "init");
+
+print("cdsacdas".find("a"));
+
+import pickle;
+d = dict(name = "hymanHu", age = 20);
+# pickle.dumps && pickle.loads
+db = pickle.dumps(d);
+print(db);
+d2 = pickle.loads(db);
+print(d2);
+# pickle.dump && pickle.load
+f = open("D:\\testDir\\test.txt", "wb");
+pickle.dump(d, f);
+f.close();
+f = open("D:\\testDir\\test.txt", "rb");
+d1 = pickle.load(f);
+f.close();
+print(d1);
+
+# ---- Json 序列化和反序列化 ----
+import json;
+# json.dumps && json.loads
+d = dict(name = "hymanHu1", age = 30);
+dj = json.dumps(d);
+print(dj);
+d2 = json.loads(dj);
+print(d2);
+# json.dump && json.load
+f = open("D:\\testDir\\test.txt", "w");
+json.dump(d, f);
+f.close();
+f = open("D:\\testDir\\test.txt", "r");
+d2 = json.load(f);
+print(d2);
+
+# 对象和Json互转
+class Student(object):
+    def __init__(self, name, age):
+        self.name = name;
+        self.age = age;
+student = Student("JiangHu", 44);
+def stu2Dict(stu):
+    return {
+        "name" : stu.name,
+        "age" : stu.age
+    };
+def dict2Stu(d):
+    return Student(d["name"], d["age"]);
+# 方式一：转Json时传入自定义对象转dict函数
+print(json.dumps(student, default=stu2Dict));
+# 方式二：转Json时传入重写的object.__dict__函数
+studentJson = json.dumps(student, default=lambda obj : obj.__dict__);
+print(studentJson);
+student2 = json.loads(studentJson, object_hook=dict2Stu);
+print(student2.name, student2.age);
+
+d = dict(name = "胡江", age = 30);
+print(json.dumps(d, ensure_ascii=False));
+print(json.dumps(d, ensure_ascii=True));
+
+# import os;
+# print("Process %s start" % os.getpid());
+# childPId = os.fork();
+# if childPId == 0:
+#     print("I am child process(%s) and my parent is %s" % (os.getpid(), os.getppid()));
+# else:
+#     print("I(%s) just create child process, id is %s" % (os.getpid(), childPId));
+
+# from multiprocessing import Process;
+# import os;
+#
+# def processCall(name):
+#     print("Run process %s(pid = %s)" % (name, os.getpid()));
+# if __name__ == "__main__":
+#     print("Parent Process is %s" % (os.getpid()));
+#     # 创建进程实例，传入函数以及参数
+#     childProcess = Process(target=processCall, args=("test",));
+#     print("Child process start");
+#     # 开始进程
+#     childProcess.start();
+#     # join()方法可以等待子进程结束后再继续往下运行，通常用于进程间的同步
+#     childProcess.join();
+#     print("Child process is end");
+#
+# from multiprocessing import Pool;
+# import os, time, random;
+#
+# def logTime(processName):
+#     print("Run task(%s), pid is %s" % (processName, os.getpid()));
+#     start = time.time();
+#     time.sleep(random.random() * 3);
+#     end = time.time();
+#     print("This task(%s) run %0.2f seconds" % (processName, (end - start)));
+# if __name__ == "__main__":
+#     print("Parent process is %s" % os.getpid());
+#     pool = Pool(4);
+#     for i in range(5):
+#         pool.apply_async(logTime, args=("process" + str(i),));
+#     print("Waiting all process done");
+#     # close调用后不能再添加进程了
+#     pool.close();
+#     # join等待多个子进程执行完毕
+#     pool.join();
+#     print("All process done");
+#
+# import subprocess;
+# print("$ nslookup www.baidu.com");
+# r = subprocess.call(["nslookup", "www.baidu.com"]);
+# print("Result:", r);
+
+# from multiprocessing import Process, Queue;
+# import os, time, random;
+#
+# def writeQueue(queue):
+#     print("Process(%s) to write" % os.getpid());
+#     for value in ["A", "B", "C"]:
+#         print("Put %s into queue" % value);
+#         queue.put(value);
+#         time.sleep(random.random());
+# def readQueue(queue):
+#     print("Process(%s) to read" % os.getpid());
+#     while True:
+#         value = queue.get(True);
+#         print("Read value %s from queue" % value);
+# if __name__ == "__main__":
+#     queue = Queue();
+#     pw = Process(target=writeQueue, args=(queue,));
+#     pr = Process(target=readQueue, args=(queue,));
+#     pw.start();
+#     pr.start();
+#     # 等待pw进程结束
+#     pw.join();
+#     # pr进程里面是死循环，强行结束
+#     pr.terminate();
+
+# import threading, time;
+#
+# def loop():
+#     print("Thread %s is running" % threading.current_thread().name);
+#     for i in range(5):
+#         print("Thread %s print number %d" % (threading.current_thread().name, i));
+#         time.sleep(1);
+#     print("Thread %s is end" % threading.current_thread().name);
+#
+# print("Thread %s is running" % threading.current_thread().name);
+# loopThread = threading.Thread(target=loop, name="LoopThread");
+# loopThread.start();
+# loopThread.join();
+# print("Thread %s is end" % threading.current_thread().name);
+
+# import time, threading;
+#
+# # 银行存款余额
+# balance = 0;
+# # 获取线程锁
+# lock = threading.Lock();
+# def changeBalance(x):
+#     # 函数内部对函数外的变量进行操作，就需要在函数内部声明其为global
+#     global balance;
+#     # 先存后取，balance期望值是0
+#     balance = balance + x;
+#     balance = balance - x;
+# def bankTread(x):
+#     for i in range(1000000):
+#         # 未加锁的情况
+#         # changeBalance(x);
+#         # 加锁的情况
+#         lock.acquire(); # 获取线程锁
+#         try:
+#             changeBalance(x);
+#         finally:
+#             lock.release(); # 释放锁
+#
+# thread1 = threading.Thread(target=bankTread, args=(4,), name="BankThread1");
+# thread2 = threading.Thread(target=bankTread, args=(8,), name="BankThread2");
+# thread1.start();
+# thread2.start();
+# thread1.join();
+# thread2.join();
+# print("The balance is %s" % balance);
+
+# import threading, multiprocessing;
+#
+# def loop():
+#     x = 0;
+#     while True:
+#         x = x ^ 1;
+# for i in range(multiprocessing.cpu_count()):
+#     thread = threading.Thread(target=loop);
+#     thread.start();
+
+# import threading;
+#
+# # 创建全局 ThreadLocal 变量
+# localThreadStudent = threading.local();
+#
+# def threadMethod(name):
+#     # 为每个线程修改 ThreadLocal 变量副本
+#     localThreadStudent.name = name;
+#     print("Thread %s student name %s" % (threading.current_thread().name, localThreadStudent.name));
+#
+# thread1 = threading.Thread(target=threadMethod, args=("HymanHu",), name="ThreadA");
+# thread2 = threading.Thread(target=threadMethod, args=("JiangHu",), name="ThreadB");
+# thread1.start();
+# thread2.start();
+# thread1.join();
+# thread2.join();
+
+import re;
+# ---- 匹配字符串 ----
+# 如果匹配成功，将返回一个Math对象，失败则返回None
+test = "010-12345";
+if re.match(r"^\d{3}\-\d{3,8}$", test):
+    print("Ok");
+else:
+    print("Error");
+# ---- 切分字符串 ----
+# 如果使用str的split方法，无法识别连续空格
+print(re.split(r"\s+", "a b   c"));
+# 将匹配逗号、空格、分号
+print(re.split(r"[\s\,\;]+", "a,b;; c   d"));
+# ---- 分组 ----
+m = re.match(r"^(\d{3})-(\d{3,8})$", "010-12345");
+print(m.groups()); # ('010', '12345')
+print(m.group(0)); # 010-12345
+print(m.group(1)); # 010
+print(m.group(2)); # 12345
+# 分组提取时间
+t = "19:05:30";
+m = re.match(r"^(0[0-9]|1[0-9]|2[0-3]|[0-9])\:"
+             r"(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]|[0-9])\:"
+             r"(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]|[0-9])$", t);
+print(m.groups());
+# ---- 贪婪匹配 ----
+print(re.match(r"^(\d+)(0*)$", "102300").groups()); # ('102300', '')
+print(re.match(r"^(\d+?)(0*)$", "102300").groups()); # ('1023', '00')
+
+emailReg = r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$';
+emailNameReg = r'<?([^@|^>]*).*@.*';
+print(re.match(emailReg, "hyman@163.com"));
+print(re.match(emailReg, "bill.gates@microsoft.com"));
+print(re.match(emailReg, "y_cat-st@example.com"));
+print(re.match(emailNameReg, "<Tom Paris> tom@voyager.org").groups());
+print(re.match(emailNameReg, "tom@voyager.org").groups());
+
+from datetime import datetime, timedelta, timezone;
+
+print(type(datetime.now()));
+print(datetime.now()); # 2020-02-22 14:35:43.328559
+print(datetime(2020, 2, 22, 13, 37, 55)); # 2020-02-22 13:37:55
+# datetime和timestamp相互转化
+print(datetime.now().timestamp()); # 1582353597.854907
+# 以本地时区做转化
+print(datetime.fromtimestamp(1582353597.854907)); # 2020-02-22 14:39:57.854907
+# 以UTC标准时区做转化
+print(datetime.utcfromtimestamp(1582353597.854907)); # 2020-02-22 06:39:57.854907
+# datetime和字符串相互转化
+print(datetime.strptime("2020-02-22 14:28:55", "%Y-%m-%d %H:%M:%S")); # 2020-02-22 14:28:55
+print(datetime.now().strftime("%Y/%m/%d %H:%M:%S")); # 2020/02/22 14:50:45
+# datetime 加减
+print(datetime.now() + timedelta(days=1));
+print(datetime.now() - timedelta(hours=10));
+print(datetime.now() + timedelta(hours=1, minutes=10));
+# datetime 设置时区
+print(datetime.utcnow()); # utc标准时间
+utcTime = datetime.now().replace(tzinfo=timezone.utc); # 拿到utc时间
+print(utcTime); # 设置当前时间为utc标准时间
+print(utcTime.astimezone(timezone(timedelta(hours=-8)))); # utc转西八区时间
+print(utcTime.astimezone(timezone(timedelta(hours=8)))); # utc转东八区时间
+
+from datetime import datetime, timedelta, timezone;
+import re;
+
+def transferToTimestamp(dateStr, timeZoneStr, formatStr):
+    dt = datetime.strptime(dateStr, formatStr);
+    print(dt);
+    timeZoneGroup = re.match(r'^UTC(\+|-)([0-9]|1[0-2]|0[0-9]):00$', timeZoneStr).groups();
+    print(timeZoneGroup);
+    if timeZoneGroup[0] == "+":
+        dt = dt.replace(tzinfo=timezone(timedelta(hours=int(timeZoneGroup[1]))));
+        print(dt);
+    else:
+        db = dt.replace(tzinfo=timezone(timedelta(hours=-int(timeZoneGroup[1]))));
+        print(dt);
+    return dt.timestamp();
+print(transferToTimestamp("2020-02-22 15:32:27", "UTC+8:00", "%Y-%m-%d %H:%M:%S"));
+
+from collections import namedtuple;
+Circle = namedtuple("Circle",["x", "y", "r"]);
+Point = namedtuple("Point", ["x", "y"]);
+p = Point(1, 2);
+print(isinstance(p, Point), isinstance(p, tuple));
+print(p.x, p.y);
+
+from collections import deque;
+d = deque(["x", "y", "z"]);
+d.append("a");
+d.appendleft("b")
+print(isinstance(d, deque), isinstance(d, list));
+print(d);
+
+from collections import defaultdict;
+d = defaultdict(lambda : "N/A");
+d["key1"] = "aaa";
+print(d["key1"], d["key2"]);
+
+from collections import OrderedDict;
+print(dict([('a', 1), ('c', 3), ('b', 2)]));
+print(OrderedDict([('a', 1), ('c', 3), ('b', 2)]));
+# OrderedDict可以实现一个FIFO（先进先出）的dict，当容量超出限制时，先删除最早添加的Key
+class LastUpdatedOrderedDict(OrderedDict):
+    def __init__(self, capacity):
+        super(LastUpdatedOrderedDict, self).__init__()
+        self._capacity = capacity
+    def __setitem__(self, key, value):
+        containsKey = 1 if key in self else 0
+        if len(self) - containsKey >= self._capacity:
+            last = self.popitem(last=False)
+            print('remove:', last)
+        if containsKey:
+            del self[key]
+            print('set:', (key, value))
+        else:
+            print('add:', (key, value))
+        OrderedDict.__setitem__(self, key, value)
+
+from collections import ChainMap
+import os, argparse
+# 构造缺省参数:
+defaults = {
+    'color': 'red',
+    'user': 'guest'
+}
+# 构造命令行参数:
+parser = argparse.ArgumentParser()
+parser.add_argument('-u', '--user')
+parser.add_argument('-c', '--color')
+namespace = parser.parse_args()
+command_line_args = { k: v for k, v in vars(namespace).items() if v }
+# 组合成ChainMap:
+combined = ChainMap(command_line_args, os.environ, defaults)
+# 打印参数:
+print('color=%s' % combined['color'])
+print('user=%s' % combined['user'])
+
+from collections import Counter;
+c = Counter();
+c.update("wwwwiiiiiffffllll")
+print(c);
+for ch in "cdsajdfkdakasjdsakdsdsa":
+    c[ch] = c[ch] + 1;
+print(c);
+
+import base64;
+print(base64.b64encode(b'binary\x00string'));
+print(base64.b64decode(b'YmluYXJ5AHN0cmluZw=='));
+print(base64.urlsafe_b64encode(b'i\xb7\x1d\xfb\xef\xff'));
+print(base64.urlsafe_b64decode('abcd--__'));
+
+import struct;
+# >表示字节顺序是big-endian，也就是网络序
+# I表示4字节无符号整数，H表示2字节无符号整数
+# pack将其他类型转bytes
+print(struct.pack(">I", 1024)); # b'\x00\x00\x04\x00'
+print(struct.pack(">H", 1024)); # b'\x04\x00'
+# pack将bytes转换回去
+print(struct.unpack(">I", b'\x00\x00\x04\x00')); # (1024,)
+print(struct.unpack(">H", b'\x04\x00')); # (1024,)
+# 指令两个，共6字节，那么后面参数需要提供6字节
+print(struct.unpack(">IH", b'\x00\x00\x04\x00\x04\x00')); # (1024, 1024)
+
+import hashlib;
+md5 = hashlib.md5();
+md5.update("Hello World!".encode("utf-8"));
+# 结果32位的16进制字符串
+print(md5.hexdigest()); # ed076287532e86365e841e92bfc50d8c
+sha1 = hashlib.sha1();
+sha1.update("Hello World!".encode("utf-8"));
+# 结果40位的16进制字符串
+print(sha1.hexdigest()); # 2ef7bde608ce5404e97d5f042f95f89f1c232871
+# 根据用户输入用户名和密码模拟登陆
+import hashlib, random;
+
+def getMd5(s):
+    return hashlib.md5(s.encode("utf-8")).hexdigest();
+class User(object):
+    def __init__(self, userName, password):
+        self.userName = userName;
+        self.salt = userName + "acj/cdsa_cdsa"
+        self.password = getMd5(password + self.salt);
+db = {
+    'michael': User('michael', '123456'),
+    'bob': User('bob', 'abc999'),
+    'alice': User('alice', 'alice2008')
+};
+def login(userName, password):
+    user = db[userName];
+    return user.password == User(userName, password).password;
+
+import hmac;
+message = "HymanHu".encode("utf-8");
+key = "hujiang@111".encode("utf-8");
+h = hmac.new(key, message, digestmod="md5");
+print(h.hexdigest());
+
+import itertools;
+
+natuals = itertools.count(1);
+ns = itertools.takewhile(lambda x : x <= 10, natuals);
+print(list(ns));
+print(list(itertools.chain("asd", "cda")));
+for key, group in itertools.groupby("aaaabbbbccccdddd"):
+    print(key, list(group));
+
+import itertools;
+
+def pi(n):
+    # step 1: 创建一个奇数序列: 1, 3, 5, 7, 9, ...
+    odd = itertools.count(start=1, step=2);
+    # step 2: 取该序列的前N项: 1, 3, 5, 7, 9, ..., 2*N-1.
+    oddList = list(itertools.takewhile(lambda x : x <= 2 * n - 1, odd));
+    # step 3: 添加正负符号并用4除: 4/1, -4/3, 4/5, -4/7, 4/9, ...
+    # oddList = [4 / (((-1) ** (x // 2)) * x) for x in oddList];
+    # step 4: 求和，使用reduce、map函数，整合三四步
+    return reduce(lambda x, y : x + y, map(lambda x : 4 / (((-1) ** (x // 2)) * x), oddList));
+print(pi(10));
+print(pi(100));
+print(pi(1000));
+print(pi(10000));
+
+from contextlib import contextmanager;
+
+class Query(object):
+    def __init__(self, name):
+        self.name = name;
+    def query(self):
+        print("Query %s" % self.name);
+# 该装饰器类似一个构造器,
+'''
+执行结果可见，yield把Query对象嵌入进来执行，
+但是方法本身的打印语句也会执行
+除了可用with语句外，还有Test中before、after的功能
+'''
+@contextmanager
+def creatQuery(name):
+    print("start")
+    yield Query(name);
+    print("end")
+
+with creatQuery("HymanHu") as q:
+    q.query();
+
+# from contextlib import closing;
+# from urllib.request import urlopen;
+#
+# with closing(urlopen("http://www.baidu.com")) as page:
+#     for line in page:
+#         print(line);
+
+# from urllib import request;
+#
+# with request.urlopen("http://www.baidu.com") as f:
+#     # 打印页面状态
+#     print("Status:", f.status, f.reason);
+#     data = f.read();
+#     # 获取页面响应头信息
+#     for key, value in f.getheaders():
+#         print("%s - %s" % (key, value));
+#     # 获取页面信息
+#     # print("data:", data.decode("utf-8"));
+
+# from urllib import request;
+
+# 模拟iPhone 6去请求百度主页
+# req = request.Request("http://www.baidu.com");
+# req.add_header('User-Agent', 'Mozilla/6.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) '
+#     'AppleWebKit/536.26 (KHTML, like Gecko) Version/8.0 Mobile/10A5376e Safari/8536.25')
+# with request.urlopen(req) as f:
+#     print("Status:", f.status, f.reason);
+#     data = f.read();
+#     for key, value in f.getheaders():
+#         print("%s - %s" % (key, value));
+
+# from urllib import request, parse;
+#
+# print("Login weibo.cn");
+# email = input("Email:");
+# password = input("Password:");
+# loginData = parse.urlencode([
+#     ("username", email),
+#     ("password", password),
+#     ('entry', 'mweibo'),
+#     ('client_id', ''),
+#     ('savestate', '1'),
+#     ('ec', ''),
+#     ('pagerefer', 'https://passport.weibo.cn/signin/welcome?entry=mweibo&r=http%3A%2F%2Fm.weibo.cn%2F')
+# ]);
+# req = request.Request("https://passport.weibo.cn/sso/login");
+# req.add_header('Origin', 'https://passport.weibo.cn');
+# req.add_header('User-Agent', 'Mozilla/6.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) '
+#     'AppleWebKit/536.26 (KHTML, like Gecko) Version/8.0 Mobile/10A5376e Safari/8536.25');
+# req.add_header('Referer', 'https://passport.weibo.cn/signin/login?'
+#     'entry=mweibo&res=wel&wm=3349&r=http%3A%2F%2Fm.weibo.cn%2F');
+#
+# with request.urlopen(req, data=loginData.encode("utf-8")) as f:
+#     print('Status:', f.status, f.reason);
+#     for k, v in f.getheaders():
+#         print('%s: %s' % (k, v));
+#     print('Data:', f.read().decode('utf-8'));
+
+# from urllib import request;
+# import urllib;
+#
+# proxyHandle = urllib.request.ProxyHandler({'http': 'http://www.example.com:3128/'});
+# proxyAuthHandler = urllib.request.ProxyBasicAuthHandler();
+# proxyAuthHandler.add_password('realm', 'host', 'username', 'password');
+# opener = urllib.request.build_opener(proxyHandle, proxyAuthHandler);
+# with opener.open('http://www.example.com/login.html') as f:
+#     pass
+
+# https://yesno.wtf/api
+
+# from urllib import request;
+# import json;
+#
+# def fetchJsonData(url):
+#     with request.urlopen(str(url)) as f:
+#         data = f.read().decode("utf-8");
+#         return json.loads(data);
+#
+# print(fetchJsonData("https://yesno.wtf/api"));
+
+xml = r'''<?xml version="1.0"?>
+<ol>
+    <li><a href="/python">Python</a></li>
+    <li><a href="/ruby">Ruby</a></li>
+</ol>
+''';
+from xml.parsers.expat import ParserCreate;
+
+class DefaultSaxHandler(object):
+    def startElement(self, name, attrs):
+        print("sax:start element: %s, attrs: %s" % (name, attrs));
+    def endElements(self, name):
+        print("sax:end element: %s" % name);
+    def charData(self, text):
+        print("sax:char data: %s" % text);
+
+# ---- 解析xml ----
+handler = DefaultSaxHandler();
+parser = ParserCreate();
+parser.StartElementHandler = handler.startElement;
+parser.EndElementHandler = handler.endElements;
+parser.CharacterDataHandler = handler.charData;
+print(parser.Parse(xml));
+
+# ---- 生成xml ----
+l = [];
+l.append(r'<?xml version="1.0"?>');
+l.append(r'<root>');
+l.append(r'some & data');
+l.append(r'</root>');
+print(''.join(l));
+
+# 解析XML格式的天气预报
+# http://flash.weather.com.cn/wmaps/xml/beijing.xml
+from xml.parsers.expat import ParserCreate;
+from urllib import request;
+
+class WeatherSaxHandler(object):
+    def __init__(self, cityNmae):
+        self.cityName = cityNmae;
+    # 初始化天气变量，city城市名，regions该城市下地区，forecast，该城市下地区预报
+    weather = {"city": "", "regions" : [], "forecast" : []};
+    def startElement(self, name, attrs):
+        if name == self.cityName:
+            self.weather["city"] = self.cityName;
+        else:
+            # 包装regions信息
+            self.weather["regions"].append(attrs["cityname"]);
+            # 包装forecast信息
+            self.weather["forecast"].append({
+                "state" : attrs["stateDetailed"],
+                "low": attrs["tem2"],
+                "high" : attrs["tem1"]
+
+            });
+# 转化xml结果，并返回weather
+def parseXml(cityNmae, xmlStr):
+    handler = WeatherSaxHandler(cityNmae);
+    parser = ParserCreate();
+    parser.StartElementHandler = handler.startElement;
+    parser.Parse(xmlStr);
+    print("City", handler.weather["city"]);
+    for x, y in zip(handler.weather["regions"], handler.weather["forecast"]):
+        print("Region: ", x);
+        print(y);
+    return handler.weather;
+# 获取天气api数据
+with request.urlopen("http://flash.weather.com.cn/wmaps/xml/chengdu.xml", timeout=4) as f:
+    parseXml("chengdu", f.read());
+
+from html.parser import HTMLParser;
+from html.entities import name2codepoint;
+
+class MyHtmlParser(HTMLParser):
+    def handle_starttag(self, tag, attrs):
+        print('<%s>' % tag);
+    def handle_endtag(self, tag):
+        print('</%s>' % tag);
+    def handle_startendtag(self, tag, attrs):
+        print('<%s/>' % tag);
+    def handle_data(self, data):
+        print(data);
+    def handle_comment(self, data):
+        print('<!--', data, '-->');
+    def handle_entityref(self, name):
+        print('&%s;' % name);
+    def handle_charref(self, name):
+        print('&#%s;' % name);
+parser = MyHtmlParser();
+print(parser.feed('''<html>
+<head></head>
+<body>
+<!-- test html parser -->
+    <p>Some <a href=\"#\">html</a> HTML&nbsp;tutorial...<br>END</p>
+</body></html>'''));
+
+from html.parser import HTMLParser;
+from urllib import request;
+from datetime import datetime;
+import re;
+
+class MyHtmlParser(HTMLParser):
+    # 定义meeting相关的标签dict，设置标记好接收数据
+    meetingTags = {'h3':0, 'time':0, 'span':0};
+    # 定义接收变量{'名称':[],'时间':[],'地点':[]}
+    meeting = {"name":[], "time":[], "address":[]};
+    # 解析标签，设置meeting相关的tags标记，如果数据在标签属性中，则直接装数据
+    def handle_starttag(self, tag, attrs):
+        if tag == "h3" and "class" in attrs and attrs["class"] == "event-title":
+            self.meeting["name"] = 1;
+        if tag == "time" and "datetime" in attrs:
+            self.meeting["time"].append(datetime.strptime(attrs['datetime'][:-6], '%Y-%m-%dT%H:%M:%S'));
+        if tag == "span" and "class" in attrs and attrs["class"] == "event-location":
+            self.meetingTags["span"] = 1;
+    # 解析数据，根据已经设置好的meeting tags来装数据
+    def handle_data(self, data):
+        if self.meetingTags["h3"] == 1:
+            self.meeting["name"].append(data);
+            self.meetingTags["h3"] == 0;
+        if self.meetingTags["span"] == 1:
+            self.meeting["address"].append(data);
+            self.meetingTags["spqn"] == 0;
+    # 打印meeting信息
+    def printMeeting(self):
+        for name, time, address in zip(self.meeting["name"], self.meeting["time"], self.meeting["address"]):
+            print(name, time, address);
+
+def parseHtml(htmlStr):
+    parser = MyHtmlParser();
+    parser.feed(htmlStr);
+    parser.printMeeting();
+
+with request.urlopen("https://www.python.org/events/python-events/", timeout=4) as f:
+    print(f.read().decode("utf-8"));
+    # parseHtml(f.read().decode("utf-8"));
+
+from html.parser import HTMLParser;
+from urllib import request;
+from datetime import datetime;
+
+
+class MyHtmlParser(HTMLParser):
+    # 定义meeting相关的标签dict，设置标记好接收数据
+    meetingTag = "";
+    # 定义接收变量{'名称':[],'时间':[],'地点':[]}
+    meeting = {"name": [], "time": [], "address": []};
+
+    # 解析标签，设置meeting相关的tags标记，如果数据在标签属性中，则直接装数据
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs);
+        if tag == 'h3' and 'class' in attrs and attrs["class"] == "event-title":
+            self.meetingTag = "h3";
+        if tag == "time" and "datetime" in attrs:
+            self.meetingTag = "time";
+            self.meeting["time"].append(datetime.strptime(attrs['datetime'][:-6], '%Y-%m-%dT%H:%M:%S'));
+        if tag == "span" and "class" in attrs and attrs["class"] == "event-location":
+            self.meetingTag = "address";
+
+    # 标签结束，将标签置空
+    def handle_endtag(self, tag):
+        meetingTag = "";
+
+    # 解析数据，根据已经设置好的meeting tags来装数据
+    def handle_data(self, data):
+        if self.meetingTag == "h3":
+            if len(data.strip()) > 0:
+                self.meeting["name"].append(data);
+        if self.meetingTag == "address":
+            if len(data.strip()) > 0:
+                self.meeting["address"].append(data);
+
+    # 打印meeting信息
+    def printMeeting(self):
+        for name, time, address in zip(self.meeting["name"], self.meeting["time"], self.meeting["address"]):
+            print(name, "----", time, "----", address);
+
+
+def parseHtml(htmlStr):
+    parser = MyHtmlParser();
+    parser.feed(htmlStr);
+    parser.printMeeting();
+
+
+# with request.urlopen("https://www.python.org/events/python-events/", timeout=40) as f:
+# print(f.read().decode("utf-8"));
+# parseHtml(f.read().decode("utf-8"));
+
+htmlStr = r'''
+<div class="most-recent-events">
+	<div class="shrubbery">
+		<h2 class="widget-title"><span aria-hidden="true" class="icon-calendar"></span>Upcoming Events</h2>
+		<p class="give-me-more"><a href="?page=2" title="More Events">More</a></p>
+		<ul class="list-recent-events menu">
+			<li>
+				<h3 class="event-title"><a href="/events/python-events/896/">HackBVICAM National Student’s Convention 2k20</a></h3>
+				<p>
+					<time datetime="2020-03-13T00:00:00+00:00">13 March<span class="say-no-more"> 2020</span></time>
+					<span class="event-location">New Delhi, India</span>
+				</p>
+			</li>
+			<li>
+				<h3 class="event-title"><a href="/events/python-events/902/">MoscowPythonConf++</a></h3>
+				<p>
+					<time datetime="2020-03-27T00:00:00+00:00">27 March<span class="say-no-more"> 2020</span></time>
+					<span class="event-location">Moscow, Russia</span>
+				</p>
+			</li>
+			<li>
+				<h3 class="event-title"><a href="/events/python-events/879/">PyCon SK 2020</a></h3>
+				<p>
+					<time datetime="2020-03-27T00:00:00+00:00">27 March – 29 March <span class="say-no-more"> 2020</span></time>
+					<span class="event-location">Bratislava, Slovakia</span>
+				</p>
+			</li>
+
+			<li>
+				<h3 class="event-title"><a href="/events/python-events/884/">PyCon Italia 2020</a></h3>
+				<p>
+					<time datetime="2020-04-02T00:00:00+00:00">02 April – 05 April <span class="say-no-more"> 2020</span></time>
+					<span class="event-location">Florence, Italy</span>
+				</p>
+			</li>
+		</ul>
+	</div>	
+</div>
+'''
+parseHtml(htmlStr);

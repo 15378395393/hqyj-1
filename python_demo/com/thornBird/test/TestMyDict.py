@@ -1,5 +1,5 @@
 import unittest;
-from com.thornBird.base.MyDict import MyDict;
+from com.thornBird.test.MyDict import MyDict;
 
 class TestMyDict(unittest.TestCase):
     # 在调用每一个测试方法前执行
