@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import requests;
 
 # ---- 读取网页 ----

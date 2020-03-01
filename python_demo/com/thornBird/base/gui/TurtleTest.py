@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import turtle;
 
 # ---- 绘制矩形 ----

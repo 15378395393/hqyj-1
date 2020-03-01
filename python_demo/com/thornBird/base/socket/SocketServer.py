@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import socket, threading;
 
 # ---- socket服务端 ----

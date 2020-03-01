@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from PIL import Image, ImageFilter;
 
 # 打开图片文件
