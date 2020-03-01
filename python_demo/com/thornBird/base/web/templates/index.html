@@ -1,0 +1,11 @@
+<html>
+<head>
+    <title>Welcome, {{ userName }}</title>
+</head>
+<body>
+    <p>Welcome, {{ userName }}!</p>
+    {% for i in pageList %}
+        <a href="/page/{{ i }}">{{ i }}</a>
+    {% endfor %}
+</body>
+</html>
