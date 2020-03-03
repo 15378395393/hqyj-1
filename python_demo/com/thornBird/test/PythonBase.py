@@ -2057,3 +2057,11 @@ htmlStr = r'''
 </div>
 '''
 parseHtml(htmlStr);
+
+a = int(3.14); # int函数在内建作用域
+__name = "HymanHu"; #全局作用域
+def fun():
+    name = "JiangHu"; # 闭包函数外的函数域
+    def fun2():
+        name = "Hawkist"; # 局部作用域
+fun();
