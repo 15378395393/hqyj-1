@@ -72,6 +72,13 @@ async def execute(sql, args, autoCommit=True):
             raise;
         return affected;
 
+# 创建sql语句中的问号字符串
+def createArgsString(n):
+    l = [];
+    for item in range(n):
+        l.append("?");
+    return ", ".join(l);
+
 '''
 定义列类
 columnName ---- 列名
@@ -105,6 +112,7 @@ class BooleanField(Field):
     def __init__(self, columnName=None, defaultValue=False):
         super().__init__(self, columnName, "boolean", False, defaultValue);
 
+# 创建类模板，Model元类
 class ModelMetaclass(type):
     def __new__(typ, className, parentClassList, classAttrs):
         if className == "Model":
@@ -136,5 +144,109 @@ class ModelMetaclass(type):
         for key in mappings.keys():
             classAttrs.pop(key);
 
+        # 将fields进行包装，每个元素变成'%**'
+        escapedFields = list(map(lambda item : '`%s`' % item, fields));
+
+        # 包装元类属性
+        classAttrs["__table__"] = tableName; # 表名
+        classAttrs["__primary_key__"] = primaryKey; # 主键
+        classAttrs["__fields__"] = fields; # 除主键外的列名
+        classAttrs["__mappings__"] = mappings; # 属性和列的映射关系
+        # 增删改查语句
+        classAttrs["__select__"] = "select `%s`, %s from `%s`" \
+            % (primaryKey, ', '.join(escapedFields), tableName);
+        classAttrs["__insert__"] = "insert into `%s` (%s) values (%s)" \
+            % (tableName, ", ".join(escapedFields), createArgsString(len(escapedFields)));
+        classAttrs["__update__"] = "update %s set %s where `%s` = ?" \
+            % (tableName, ', '.join(map(lambda f : '`%s`=?' % (mappings.get(f).name or f)), primaryKey));
+        attrs['__delete__'] = "delete from `%s` where `%s`=?" % (tableName, primaryKey);
+        return type.__new__(typ, className, parentClassList, classAttrs);
+
+# 创建所有实体类父类Model
+class Model(dict, metaclass=ModelMetaclass):
+    def __init__(self, **kw):
+        super(Model, self).__init__(**kw);
+    def __getattr__(self, key):
+        try:
+            return self[key];
+        except KeyError:
+            raise AttributeError(r"'Model' object has no attribute '%s'" % key);
+    def __setattr__(self, key, value):
+        self[key] = value;
+    def getValue(self, key):
+        return getattr(self, key, None);
+    # 获取不到值时，返回默认值
+    def getValueOrDefault(self, key):
+        value = getattr(self, key, None);
+        if value is None:
+            field = self.__mappings__[key];
+            if field.defaultValue is not None:
+                value = field.default() if callable(field.default) else field.defaultValue;
+                logging.debug('using default value for %s: %s' % (key, str(value)));
+                setattr(self, key, value);
+        return value;
+
+    # 定义各种常用实体bean操作方法
+    @classmethod
+    async def findAll(cls, where=None, args=[], **kw):
+        sql = [cls.__select__];
+        if where:
+            sql.append("where");
+            sql.append(where);
+        orderBy = kw.get("orderBy", None);
+        if orderBy:
+            sql.append("order by");
+            sql.append(orderBy);
+        limit = kw.get("limit", None);
+        if limit is not None:
+            if isinstance(limit, int):
+                sql.append("limit");
+                args.append(limit);
+            elif isinstance(limit, tuple) and len(limit) == 2:
+                sql.append("?, ?");
+                args.extend(limit);
+            else:
+                raise ValueError('Invalid limit value: %s' % str(limit));
+        rs = await select(" ".join(sql), args);
+        return [cls(**r) for r in rs];
+
+    @classmethod
+    async def findNumber(cls, selectField, where=None, args=None):
+        sql = ['select %s _num_ from `%s`' % (selectField, cls.__table__)];
+        if where:
+            sql.append('where');
+            sql.append(where);
+        rs = await select(' '.join(sql), args, 1);
+        if len(rs) == 0:
+            return None
+        return rs[0]['_num_'];
+
+    ' find object by primary key. '
+    @classmethod
+    async def find(cls, pk):
+        rs = await select('%s where `%s`=?' % (cls.__select__, cls.__primary_key__), [pk], 1);
+        if len(rs) == 0:
+            return None;
+        return cls(**rs[0]);
+
+    async def save(self):
+        args = list(map(self.getValueOrDefault, self.__fields__));
+        args.append(self.getValueOrDefault(self.__primary_key__));
+        rows = await execute(self.__insert__, args);
+        if rows != 1:
+            logging.debug('failed to insert record: affected rows: %s' % rows);
+
+    async def update(self):
+        args = list(map(self.getValue, self.__fields__));
+        args.append(self.getValue(self.__primary_key__));
+        rows = await execute(self.__update__, args);
+        if rows != 1:
+            logging.warn('failed to update by primary key: affected rows: %s' % rows);
+
+    async def remove(self):
+        args = [self.getValue(self.__primary_key__)];
+        rows = await execute(self.__delete__, args);
+        if rows != 1:
+            logging.warn('failed to remove by primary key: affected rows: %s' % rows);
 
 
