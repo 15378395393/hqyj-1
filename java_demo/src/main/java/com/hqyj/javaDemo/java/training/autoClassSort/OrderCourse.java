@@ -3,6 +3,7 @@
 package com.hqyj.javaDemo.java.training.autoClassSort;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
 
@@ -68,7 +69,7 @@ public class OrderCourse {
 
 	}
 
-	/*public void initShow() {
+	public void initShow() {
 		System.out.println("目前排课的资源情况如下：");
 		System.out.println("教师情况");
 		for (Teacher t : tList) {
@@ -89,7 +90,7 @@ public class OrderCourse {
 			System.out.println("班级ID：" + c.getId() + " 班级名称: " + c.getName()
 					+ " 班级人数：" + c.getNumber());
 		}
-	}*/
+	}
 
 	// 增加排课资源数
 	public void add() {
@@ -108,8 +109,8 @@ public class OrderCourse {
 			//contains是判断是否包含有XX
 			if (!subList.contains(m)) {
 				subList.add(m);
-				j++;
 			}
+			j++;
 			if (j == timesWeek) {
 				break;
 			}
@@ -132,6 +133,41 @@ public class OrderCourse {
 	}
 */
 	// 排课流程
+	public void order(List<Teacher> teacherList, List<Class> classList, 
+			List<Course> courseList, List<ClassRoom> classRoomList) {
+		for(Teacher teacher : teacherList) {
+			// 根据下标找出老师对应的教室
+			Course course = courseList.get(teacherList.indexOf(teacher));
+			LinkedList<String> teacherSequenceTemp = new LinkedList<>();
+			LinkedList<String> teacherClassTemp = new LinkedList<>();
+			LinkedList<String> teacherClassRandom = new LinkedList<>();
+			
+			System.out.println("===========================================");
+			System.out.println(teacher.getName() + "的课表详情排列如下： " + "课程名称: "
+					+ course.getName());
+			for(Class cla : classList) {
+				// 根据下标找出班级对应的教室
+				ClassRoom classRoom = classRoomList.get(classList.indexOf(cla));
+				// 将老师空闲时间存入临时表
+				teacherSequenceTemp = (LinkedList<String>) (teacher.getTs().getList().clone());
+				// 求老师空闲时间和班级课程交集，并放入临时列表
+				teacher.getTs().getList().retainAll(cla.getCs().getList());
+				teacherClassTemp = teacher.getTs().getList();
+				// 取出老师和班级的随机组合列表
+				teacherClassRandom = randList(teacherClassTemp, course.getTimesWeek());
+				// 班级课程移除被排出的时间
+				cla.getCs().getList().removeAll(teacherClassRandom);
+				// 老师移除被排除的时间
+				teacher.getTs().setList(teacherSequenceTemp);
+				teacher.getTs().getList().removeAll(teacherClassRandom);
+				
+				System.out.println("班级名称： " + cla.getName() + " 教室名称： " + classRoom.getName());
+				for (String s : listToTree(teacherClassRandom)) {
+					System.out.println(s);
+				}
+			}
+		}
+	}
 	
 	public void order(Teacher t){
 		Course course = null;
