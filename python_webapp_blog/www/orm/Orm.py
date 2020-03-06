@@ -2,15 +2,8 @@
 # -*- coding: utf-8 -*-
 __author__ = "HymanHu";
 import aiomysql;
-from www.globalLog import LOGGER;
-
-# log sql 语句
-def logSql(sql, args):
-    LOGGER.debug("Sql: %s, Args: %s" % (sql, args));
-
-class StandardError(Exception):
-    def __init__(self, *args):
-        self.args = args;
+from www.common.GlobalLog import LOGGER;
+from www.common.CustomException import StandardError;
 
 # 创建连接池
 async def createPool(loop, **kw):
@@ -28,6 +21,10 @@ async def createPool(loop, **kw):
         minsize=kw.get("minsize", 1),
         loop=loop
     );
+
+# log sql 语句
+def logSql(sql, args):
+    LOGGER.debug("Sql: %s, Args: %s" % (sql, args));
 
 '''
 select方法
@@ -72,13 +69,6 @@ async def execute(sql, args, autoCommit=True):
                 conn.rollback();
             raise;
         return affected;
-
-# 创建sql语句中的问号字符串
-def createArgsString(n):
-    l = [];
-    for item in range(n):
-        l.append("?");
-    return ", ".join(l);
 
 '''
 定义列类
@@ -126,11 +116,8 @@ class ModelMetaclass(type):
         mappings = dict();
         # 主键列
         primaryKey = None;
-        # 考虑到entity属性和列名不一致的情况，用下面两个变量来装载
         # 非主键列列表
         fields = [];
-        # 非主键属性名列表
-        properties = [];
         for key, value in classAttrs.items():
             if isinstance(value, Field):
                 LOGGER.debug("  Found mapping %s ----> %s" % (key, value));
@@ -141,7 +128,6 @@ class ModelMetaclass(type):
                     # primaryKey = key;
                     primaryKey = value.columnName if value.columnName else key;
                 else:
-                    properties.append(key);
                     # fields.append(key);
                     fields.append(value.columnName if value.columnName else key);
         if not primaryKey:
@@ -158,7 +144,6 @@ class ModelMetaclass(type):
         classAttrs["__table__"] = tableName; # 表名
         classAttrs["__primary_key__"] = primaryKey; # 主键
         classAttrs["__fields__"] = fields; # 除主键外的列名
-        classAttrs["__properties__"] = properties; # 非主键属性名列表
         classAttrs["__mappings__"] = mappings; # 属性和列的映射关系
         # 增删改查语句
         classAttrs["__select__"] = "select `%s`, %s from `%s`" \
@@ -166,7 +151,7 @@ class ModelMetaclass(type):
         classAttrs["__insert__"] = 'insert into `%s` (%s, `%s`) values (%s)' \
             % (tableName, ', '.join(escapedFields), primaryKey, createArgsString(len(escapedFields) + 1));
         classAttrs["__update__"] = "update %s set %s where `%s` = ?" \
-            % (tableName, ', '.join(map(lambda f : '`%s`=?' % (mappings.get(f).columnName or f), properties)), primaryKey);
+            % (tableName, ', '.join(map(lambda f : '`%s`=?' % (mappings.get(f).columnName or f), fields)), primaryKey);
         classAttrs['__delete__'] = "delete from `%s` where `%s`=?" % (tableName, primaryKey);
         return type.__new__(typ, className, parentClassList, classAttrs);
 
@@ -244,14 +229,14 @@ class Model(dict, metaclass=ModelMetaclass):
         return cls(**rs[0]);
 
     async def save(self):
-        args = list(map(self.getValueOrDefault, self.__properties__));
+        args = list(map(self.getValueOrDefault, self.__fields__));
         args.append(self.getValueOrDefault(self.__primary_key__));
         rows = await execute(self.__insert__, args);
         if rows != 1:
             LOGGER.debug('failed to insert record: affected rows: %s' % rows);
 
     async def update(self):
-        args = list(map(self.getValue, self.__properties__));
+        args = list(map(self.getValue, self.__fields__));
         args.append(self.getValue(self.__primary_key__));
         rows = await execute(self.__update__, args);
         if rows != 1:
@@ -263,4 +248,9 @@ class Model(dict, metaclass=ModelMetaclass):
         if rows != 1:
             LOGGER.warn('failed to remove by primary key: affected rows: %s' % rows);
 
-
+# 创建sql语句中的问号字符串
+def createArgsString(n):
+    l = [];
+    for item in range(n):
+        l.append("?");
+    return ", ".join(l);

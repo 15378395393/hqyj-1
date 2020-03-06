@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 __author__ = "HymanHu";
-import asyncio, os, json, time;
+import asyncio;
 from aiohttp import web;
-from datetime import datetime;
-from www.globalLog import LOGGER;
+from www.common.GlobalLog import LOGGER;
 
 # 主页http://127.0.0.1:8080/
 def index(request):
