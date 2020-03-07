@@ -101,14 +101,14 @@ class RequestHandler(object):
             if request.method == 'POST':
                 if not request.content_type:
                     return web.HTTPBadRequest('Missing Content-Type.');
-                contentType = request.content_type.lower();
-                if contentType.startswith('application/json'):
+                content_type = request.content_type.lower();
+                if content_type.startswith('application/json'):
                     params = await request.json();
                     if not isinstance(params, dict):
                         return web.HTTPBadRequest('JSON body must be object.');
                     kw = params;
-                elif contentType.startswith('application/x-www-form-urlencoded') \
-                        or contentType.startswith('multipart/form-data'):
+                elif content_type.startswith('application/x-www-form-urlencoded') \
+                        or content_type.startswith('multipart/form-data'):
                     params = await request.post();
                     kw = dict(**params);
                 else:
@@ -150,35 +150,45 @@ class RequestHandler(object):
         except APIError as e:
             return dict(error=e.error, data=e.data, message=e.message);
 
-# ---- 注册Url处理函数 ----
+# 注册静态资源
 def add_static(app):
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
-    app.router.add_static('/static/', path)
-    LOGGER.info('add static %s => %s' % ('/static/', path))
+    separator = "\\" if os.name == "nt" else "/";
+    projectName = "python_webapp_blog" + separator;
+    curPath = os.path.abspath(os.path.dirname(__file__));  # 获取当前文夹路径
+    rootPath = curPath[:curPath.find(projectName) + len(projectName)];  # 获取项目根目录
+    staticPath = rootPath + "www" + separator + "static";
+    app.router.add_static('/static/', staticPath);
+    LOGGER.info('add static %s => %s' % ('/static/', staticPath));
 
+# ---- 注册Url处理函数 ----
 def add_route(app, fn):
-    method = getattr(fn, '__method__', None)
-    path = getattr(fn, '__route__', None)
+    method = getattr(fn, '__method__', None);
+    path = getattr(fn, '__route__', None);
     if path is None or method is None:
-        raise ValueError('@get or @post not defined in %s.' % str(fn))
+        raise ValueError('@get or @post not defined in %s.' % str(fn));
+    # 判断函数是否为coroutine、生成器函数
     if not asyncio.iscoroutinefunction(fn) and not inspect.isgeneratorfunction(fn):
-        fn = asyncio.coroutine(fn)
-    LOGGER.info('add route %s %s => %s(%s)' % (method, path, fn.__name__, ', '.join(inspect.signature(fn).parameters.keys())))
-    app.router.add_route(method, path, RequestHandler(app, fn))
+        fn = asyncio.coroutine(fn);
+    LOGGER.info('add route %s %s => %s(%s)' % (method, path, fn.__name__,
+        ', '.join(inspect.signature(fn).parameters.keys())));
+    # 注册函数的时候，初始化RequestHandler对象，因其重写了__call__函数，该对象实例化当函数调用
+    app.router.add_route(method, path, RequestHandler(app, fn));
 
+# 根据模块批量注册Url处理函数
 def add_routes(app, module_name):
     n = module_name.rfind('.')
     if n == (-1):
-        mod = __import__(module_name, globals(), locals())
+        mod = __import__(module_name, globals(), locals());
     else:
-        name = module_name[n+1:]
-        mod = getattr(__import__(module_name[:n], globals(), locals(), [name]), name)
+        name = module_name[n+1:];
+        mod = getattr(__import__(module_name[:n], globals(), locals(), [name]), name);
+    # 扫描模块属性，若是有__method__、__route__则添加app.router中
     for attr in dir(mod):
         if attr.startswith('_'):
-            continue
-        fn = getattr(mod, attr)
+            continue;
+        fn = getattr(mod, attr);
         if callable(fn):
-            method = getattr(fn, '__method__', None)
-            path = getattr(fn, '__route__', None)
+            method = getattr(fn, '__method__', None);
+            path = getattr(fn, '__route__', None);
             if method and path:
-                add_route(app, fn)
+                add_route(app, fn);

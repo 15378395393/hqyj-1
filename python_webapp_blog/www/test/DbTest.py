@@ -7,20 +7,20 @@ from www.orm.Models import User;
 async def entityTest(loop):
     # 如果不加yield from，只是创建了协程，没有真正的调用
     await www.orm.Orm.createPool(loop, user="root", password="root", db="python_blog");
-    user = User(name="admin", email="admin2@163.com", password="111111", image="about:blank");
+    user = User(name="admin", email="admin1@163.com", password="111111", image="about:blank");
     # await user.save();
     users = await User.findAll();
     for user in users:
         print(user);
     number = await User.findNumber("id");
     print(number);
-    id = "001583398360340419b257cc212405189b3ff093d23fbce000";
+    id = "001583558544013416b355a808a498f8ea8343594795d40000";
     user = await User.find(id);
     print(user);
     user.__setattr__("name", "HymanHu1");
     await user.update();
-    user.__setattr__("id", "0015834594686206ab5ffbd08fe427fb995f2a8279cb756000");
-    await user.remove();
+    # user.__setattr__("id", "0015834594686206ab5ffbd08fe427fb995f2a8279cb756000");
+    # await user.remove();
 
 loop = asyncio.get_event_loop();
 loop.run_until_complete(entityTest(loop));
