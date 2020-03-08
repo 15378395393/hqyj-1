@@ -50,7 +50,6 @@ def init_jinja2(app, **kw):
     app['__template__'] = env;
 
 # 定义中间件logger_factory，log请求method、path
-@middleware
 async def logger_factory(app, handler):
     async def logger(request):
         LOGGER.info('Request: %s %s' % (request.method, request.path));
@@ -59,7 +58,6 @@ async def logger_factory(app, handler):
     return logger;
 
 # 定义中间件data_factory，将请求的数据包装到request.__data__中
-@middleware
 async def data_factory(app, handler):
     async def parse_data(request):
         if request.method == 'POST':
@@ -73,7 +71,6 @@ async def data_factory(app, handler):
     return parse_data;
 
 # 定义中间件response_factory，处理响应
-@middleware
 async def response_factory(app, handler):
     async def response(request):
         LOGGER.info('Response handler...');
@@ -103,7 +100,7 @@ async def response_factory(app, handler):
                 return resp;
             else:
                 resp = web.Response(
-                    body=app['__templating__'].get_template(template).render(**r).encode('utf-8'));
+                    body=app['__template__'].get_template(template).render(**r).encode('utf-8'));
                 resp.content_type = 'text/html;charset=utf-8';
                 return resp;
         # 检查是否响应码
@@ -119,13 +116,6 @@ async def response_factory(app, handler):
         return resp;
     return response;
 
-# 主页http://127.0.0.1:8080/
-def index(request):
-    resp = web.Response(body=b'<h1>Python WebApp Blog</h1>');
-    # 如果不添加content_type，某些严谨的浏览器会把网页当成文件下载，而不是直接显示
-    resp.content_type = "text/html;charset=utf-8";
-    return resp;
-
 # 初始化aiohttp web server
 async def init(loop):
     # 创建数据库连接池
@@ -137,7 +127,7 @@ async def init(loop):
     # 初始化页面模版
     init_jinja2(app, filters=dict(datetime=datetime_filter));
     # 注册路由，全书写在www.web.handlers模块下
-    www.web.WebHandler.add_routes(app, "www.web.UrlHandlers");
+    www.web.WebHandler.add_routes(app, "www.web.BlogController");
     # 注册静态资源
     www.web.WebHandler.add_static(app);
     # 启动app
