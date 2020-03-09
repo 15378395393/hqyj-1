@@ -7,6 +7,7 @@ import www.web.WebHandler;
 from aiohttp import web;
 from aiohttp.web import middleware;
 from www.common.GlobalLog import LOGGER;
+from conf.Config import configs;
 from jinja2 import Environment, FileSystemLoader;
 from datetime import datetime;
 
@@ -118,8 +119,9 @@ async def response_factory(app, handler):
 
 # 初始化aiohttp web server
 async def init(loop):
-    # 创建数据库连接池
-    await www.orm.Orm.createPool(loop, user="root", password="root", db="python_blog");
+    # 创建数据库连接池，从配置文件中读取
+    # await www.orm.Orm.createPool(loop, user="root", password="root", db="python_blog");
+    await www.orm.Orm.createPool(loop, **configs.db);
     # 初始化app，并传入中间件
     app = web.Application(middlewares=[
         logger_factory, data_factory, response_factory
@@ -133,8 +135,8 @@ async def init(loop):
     # 启动app
     runner = web.AppRunner(app);
     await runner.setup();
-    srv = web.TCPSite(runner, '127.0.0.1', 8080)
-    LOGGER.debug("Server start at 127.0.0.1:8080...");
+    srv = web.TCPSite(runner, configs.host, configs.port);
+    LOGGER.debug("Server start at %s:%s..." % (configs.host, configs.port));
     await srv.start();
 
 loop = asyncio.get_event_loop();
