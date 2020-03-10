@@ -3,9 +3,8 @@
 __author__ = "HymanHu";
 import asyncio, json, os, time;
 import www.orm.Orm;
-import www.web.WebHandler;
+from www.web.WebHandler import *;
 from aiohttp import web;
-from aiohttp.web import middleware;
 from www.common.GlobalLog import LOGGER;
 from conf.Config import configs;
 from jinja2 import Environment, FileSystemLoader;
@@ -71,6 +70,24 @@ async def data_factory(app, handler):
         return (await handler(request));
     return parse_data;
 
+# ---- 定义中间件，解析cookie，获取user进行登录校验 ----
+async def auth_factory(app, handler):
+    async def auth(request):
+        LOGGER.info('check user: %s %s' % (request.method, request.path));
+        request.__user__ = None;
+        cookie_str = request.cookies.get(COOKIE_NAME);
+        if cookie_str:
+            user = await cookie2user(cookie_str);
+            if user:
+                LOGGER.info('Set current user: %s' % user.email);
+                request.__user__ = user;
+        if (request.path not in URL_FILTER_LIST and request.__user__ is None) or \
+                (request.path.startswith('/manage') and request.__user__ is None and
+                 not request.__user__.admin):
+            return web.HTTPFound('/signin');
+        return (await handler(request));
+    return auth;
+
 # 定义中间件response_factory，处理响应
 async def response_factory(app, handler):
     async def response(request):
@@ -100,6 +117,8 @@ async def response_factory(app, handler):
                 resp.content_type = 'application/json;charset=utf-8';
                 return resp;
             else:
+                # 将user信息包装到响应里面
+                r['__user__'] = request.__user__;
                 resp = web.Response(
                     body=app['__template__'].get_template(template).render(**r).encode('utf-8'));
                 resp.content_type = 'text/html;charset=utf-8';
@@ -124,7 +143,7 @@ async def init(loop):
     await www.orm.Orm.createPool(loop, **configs.db);
     # 初始化app，并传入中间件
     app = web.Application(middlewares=[
-        logger_factory, data_factory, response_factory
+        logger_factory, data_factory, auth_factory, response_factory
     ]);
     # 初始化页面模版
     init_jinja2(app, filters=dict(datetime=datetime_filter));

@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 __author__ = "HymanHu";
-import functools, inspect,os, asyncio;
+import functools, inspect,os, asyncio, time, hashlib;
 from aiohttp import web;
 from urllib import parse;
 from www.common.GlobalLog import LOGGER;
 from www.common.CustomException import *;
+from conf.Config import configs;
+from www.orm.Models import User;
+
+# ---- 常量 ----
+COOKIE_NAME = 'pythonWebBlog';
+COOKIE_KEY = configs.session.secret;
+URL_FILTER_LIST = ["/register", "/api/user", "/signin", "/api/authenticate"];
 
 # get装饰器:@get('/path')
 def get(path):
@@ -150,7 +157,7 @@ class RequestHandler(object):
         except APIError as e:
             return dict(error=e.error, data=e.data, message=e.message);
 
-# 注册静态资源
+# ---- 注册静态资源 ----
 def add_static(app):
     separator = "\\" if os.name == "nt" else "/";
     projectName = "python_webapp_blog" + separator;
@@ -192,3 +199,35 @@ def add_routes(app, module_name):
             path = getattr(fn, '__route__', None);
             if method and path:
                 add_route(app, fn);
+
+# ---- COOKIE处理 ----
+# 根据user生成cookie
+def user2cookie(user, max_age):
+    expires = str(int(time.time() + max_age));
+    s = '%s-%s-%s-%s' % (user.id, user.password, expires, COOKIE_KEY);
+    L = [user.id, expires, hashlib.sha1(s.encode('utf-8')).hexdigest()];
+    return '-'.join(L);
+
+# 根据cookie加载user
+async def cookie2user(cookie_str):
+    if not cookie_str:
+        return None;
+    try:
+        L = cookie_str.split('-');
+        if len(L) != 3:
+            return None;
+        uid, expires, sha1 = L;
+        if int(expires) < time.time():
+            return None;
+        user = await User.find(uid);
+        if user is None:
+            return None;
+        s = '%s-%s-%s-%s' % (uid, user.password, expires, COOKIE_KEY);
+        if sha1 != hashlib.sha1(s.encode('utf-8')).hexdigest():
+            LOGGER.info('invalid sha1');
+            return None;
+        user.passwd = '******';
+        return user;
+    except Exception as e:
+        LOGGER.exception(e);
+        return None;
