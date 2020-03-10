@@ -191,12 +191,15 @@ class Model(dict, metaclass=ModelMetaclass):
         if where:
             sql.append("where");
             sql.append(where);
+        if args is None:
+            args = [];
         orderBy = kw.get("orderBy", None);
         if orderBy:
             sql.append("order by");
             sql.append(orderBy);
         limit = kw.get("limit", None);
         if limit is not None:
+            sql.append('limit')
             if isinstance(limit, int):
                 sql.append("limit");
                 args.append(limit);
