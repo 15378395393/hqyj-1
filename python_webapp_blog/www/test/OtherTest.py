@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 __author__ = "HymanHu";
-import os;
+import os, time;
 
 def dirList(dir):
     dir = os.path.abspath(dir);
@@ -12,4 +12,6 @@ def dirList(dir):
         else:
             print(sonDir);
 
-dirList(os.path.abspath(os.path.dirname(__file__)));
+# dirList(os.path.abspath(os.path.dirname(__file__)));
+
+print(time.time());

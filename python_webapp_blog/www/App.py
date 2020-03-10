@@ -74,6 +74,9 @@ async def data_factory(app, handler):
 async def auth_factory(app, handler):
     async def auth(request):
         LOGGER.info('check user: %s %s' % (request.method, request.path));
+        # 放行静态资源
+        if request.path.startswith('/static'):
+            return (await handler(request));
         request.__user__ = None;
         cookie_str = request.cookies.get(COOKIE_NAME);
         if cookie_str:
