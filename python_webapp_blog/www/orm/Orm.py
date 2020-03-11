@@ -184,9 +184,12 @@ class Model(dict, metaclass=ModelMetaclass):
                 setattr(self, key, value);
         return value;
 
-    # 定义各种常用实体bean操作方法
+    '''
+    定义各种常用实体bean操作方法
+    args默认值不要定义为[]，list是可变类型，多次调用会叠加之前的值
+    '''
     @classmethod
-    async def findAll(cls, where=None, args=[], **kw):
+    async def findAll(cls, where=None, args=None, **kw):
         sql = [cls.__select__];
         if where:
             sql.append("where");
@@ -201,7 +204,7 @@ class Model(dict, metaclass=ModelMetaclass):
         if limit is not None:
             sql.append('limit')
             if isinstance(limit, int):
-                sql.append("limit");
+                sql.append("?");
                 args.append(limit);
             elif isinstance(limit, tuple) and len(limit) == 2:
                 sql.append("?, ?");

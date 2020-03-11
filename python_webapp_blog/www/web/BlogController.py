@@ -79,6 +79,54 @@ def signout(request):
     LOGGER.info('user signed out.');
     return r;
 
+# ---- 主页模块 ----
+@get('/')
+async def index(*, page='1'):
+    page_index = get_page_index(page);
+    num = await Blog.findNumber('count(id)');
+    page = Page(num);
+    if num == 0:
+        blogs = [];
+    else:
+        blogs = await Blog.findAll(orderBy='created_date desc', limit=(page.offset, page.limit));
+    return {
+        '__template__': 'blogs.html',
+        'page': page,
+        'blogs': blogs
+    };
+
+@get('/blogs')
+def blogs():
+    return 'redirect:/'
+
+# ---- 博客列表管理模块 ----
+# 博客列表管理页面
+@get('/manage/blogs')
+def manage_blogs(*, page='1'):
+    return {
+        '__template__': 'managerBlogs.html',
+        'page_index': get_page_index(page)
+    };
+
+# 博客列表
+@get('/api/blogs')
+async def api_blogs(*, page='1'):
+    page_index = get_page_index(page);
+    num = await Blog.findNumber('count(id)');
+    p = Page(num, page_index);
+    if num == 0:
+        return dict(page=p, blogs=());
+    blogs = await Blog.findAll(orderBy='created_date desc', limit=(p.offset, p.limit));
+    return dict(page=p, blogs=blogs);
+
+# 删除博客
+@post('/api/blog/{id}/delete')
+async def api_delete_blog(request, *, id):
+    check_admin(request);
+    blog = await Blog.find(id);
+    await blog.remove();
+    return dict(id=id);
+
 # ---- 博客创建模块 ----
 @get('/manage/blog')
 def manage_create_blog():
@@ -103,56 +151,120 @@ async def api_create_blog(request, *, name, summary, content):
     await blog.save();
     return blog;
 
-# ---- 博客列表管理模块 ----
-@get('/manage/blogs')
-def manage_blogs(*, page='1'):
+# ---- 博客编辑模块 ----
+# 博客编辑页面
+@get('/manage/blog/{id}')
+def manage_edit_blog(*, id):
     return {
-        '__template__': 'managerBlogs.html',
-        'page_index': get_page_index(page)
+        '__template__': 'managerBlogEdit.html',
+        'id': id,
+        'action': '/api/blog/%s' % id
     };
 
-@get('/api/blogs')
-async def api_blogs(*, page='1'):
-    page_index = get_page_index(page);
-    num = await Blog.findNumber('count(id)');
-    p = Page(num, page_index);
-    if num == 0:
-        return dict(page=p, blogs=());
-    blogs = await Blog.findAll(orderBy='created_date desc', limit=(p.offset, p.limit));
-    return dict(page=p, blogs=blogs);
-
-# 获取id获取博客接口
-@get('/api/blog/{id}')
-async def api_get_blog(*, id):
+# 编辑博客
+@post('/api/blog/{id}')
+async def api_update_blog(id, request, *, name, summary, content):
+    check_admin(request);
     blog = await Blog.find(id);
+    if not name or not name.strip():
+        raise APIValueError('name', 'name cannot be empty.');
+    if not summary or not summary.strip():
+        raise APIValueError('summary', 'summary cannot be empty.');
+    if not content or not content.strip():
+        raise APIValueError('content', 'content cannot be empty.');
+    blog.name = name.strip();
+    blog.summary = summary.strip();
+    blog.content = content.strip();
+    await blog.update();
     return blog;
 
-# 根据id返回博客页
+# ---- 博客展示模块 ----
+# 博客展示页面
 @get('/blog/{id}')
 async def get_blog(id):
     blog = await Blog.find(id);
-    comments = await Comment.findAll('blog_id=?', [id], orderBy='created_at desc');
+    comments = await Comment.findAll('blog_id=?', [id], orderBy='created_date desc');
     for c in comments:
         c.html_content = text2html(c.content);
-    blog.html_content = markdown2.markdown(blog.content);
+    # blog.html_content = markdown2.markdown(blog.content);
+    blog.html_content = markdown2.markdown(text2html(blog.content));
     return {
         '__template__': 'blog.html',
         'blog': blog,
         'comments': comments
     };
 
-# 博客列表
-@get("/")
-async def blogs(request):
-    blogs = await Blog.findAll(orderBy='created_date desc');
+# 添加评论
+@post('/api/blog/{id}/comment')
+async def api_create_comment(id, request, *, content):
+    user = request.__user__;
+    if user is None:
+        raise APIPermissionError('Please signin first.');
+    if not content or not content.strip():
+        raise APIValueError('content');
+    blog = await Blog.find(id);
+    if blog is None:
+        raise APIResourceNotFoundError('Blog');
+    comment = Comment(blog_id=blog.id, user_id=user.id, user_name=user.name,
+                      user_image=user.image, content=content.strip());
+    await comment.save();
+    return comment;
+
+# ---- 评论管理模块 ----
+# 评论列表页面
+@get('/manage/comments')
+def manage_comments(*, page='1'):
     return {
-        '__template__': 'blogs.html',
-        'blogs': blogs
+        '__template__': 'manageComments.html',
+        'page_index': get_page_index(page)
+    }
+
+# 评论列表
+@get('/api/comments')
+async def api_comments(*, page='1'):
+    page_index = get_page_index(page);
+    num = await Comment.findNumber('count(id)');
+    p = Page(num, page_index);
+    if num == 0:
+        return dict(page=p, comments=());
+    comments = await Comment.findAll(orderBy='created_date desc', limit=(p.offset, p.limit));
+    return dict(page=p, comments=comments);
+
+# ---- 删除评论 ----
+@post('/api/comment/{id}/delete')
+async def api_delete_comments(id, request):
+    check_admin(request);
+    c = await Comment.find(id);
+    if c is None:
+        raise APIResourceNotFoundError('Comment');
+    await c.remove();
+    return dict(id=id);
+
+# ---- 用户管理模块 ----
+# 用户列表页面
+@get('/manage/users')
+def manage_users(*, page='1'):
+    return {
+        '__template__': 'manageUsers.html',
+        'page_index': get_page_index(page)
     };
+
+# 用户列表
+@get('/api/users')
+async def api_get_users(*, page='1'):
+    page_index = get_page_index(page);
+    num = await User.findNumber('count(id)');
+    p = Page(num, page_index);
+    if num == 0:
+        return dict(page=p, users=());
+    users = await User.findAll(orderBy='created_date desc', limit=(p.offset, p.limit));
+    for u in users:
+        u.passwd = '******';
+    return dict(page=p, users=users);
 
 # ---- 测试模块 ----
 @get('/index')
-async def index(request):
+async def indexTest(request):
     users = await User.findAll();
     return {
         '__template__': 'index.html',
