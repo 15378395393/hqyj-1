@@ -1,4 +1,4 @@
-package com.hqyj.javaDemo.java.training.autoClassSort;
+package com.hqyj.javaDemo.algorithm;
 
 import java.util.Arrays;
 import java.util.Calendar;
