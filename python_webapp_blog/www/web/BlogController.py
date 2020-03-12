@@ -8,6 +8,7 @@ from www.orm.Models import *;
 from www.common.BlogCommons import *;
 
 # ---- 用户注册模块 ----
+
 @get('/register')
 def register():
     return {
@@ -82,17 +83,16 @@ def signout(request):
 # ---- 主页模块 ----
 @get('/')
 async def index(*, page='1'):
-    page_index = get_page_index(page);
-    num = await Blog.findNumber('count(id)');
-    page = Page(num);
-    if num == 0:
-        blogs = [];
-    else:
-        blogs = await Blog.findAll(orderBy='created_date desc', limit=(page.offset, page.limit));
+    # page_index = get_page_index(page);
+    # num = await Blog.findNumber('count(id)');
+    # page = Page(num);
+    # if num == 0:
+    #     blogs = [];
+    # else:
+    #     blogs = await Blog.findAll(orderBy='created_date desc', limit=(page.offset, page.limit));
     return {
         '__template__': 'blogs.html',
-        'page': page,
-        'blogs': blogs
+        'page_index': get_page_index(page)
     };
 
 @get('/blogs')
@@ -160,6 +160,11 @@ def manage_edit_blog(*, id):
         'id': id,
         'action': '/api/blog/%s' % id
     };
+
+@get('/api/blog/{id}')
+async def api_get_blog(*, id):
+    blog = await Blog.find(id);
+    return blog;
 
 # 编辑博客
 @post('/api/blog/{id}')

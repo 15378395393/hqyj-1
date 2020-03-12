@@ -1,0 +1,55 @@
+{% extends '__base__.html' %}
+
+{% block title %}日志{% endblock %}
+{% block beforehead %}
+    <script>
+        var page = '{{ page_index }}';
+        var pageData = '{{ page }}';
+        function pageRender(pageData) {
+            var pageString = '<ul class="uk-pagination">';
+            if (pageData.has_previous) {
+                pageString += '<li><a v-attr="onclick:\'gotoPage(\' + ('+pageData.page_index-1 +') + \')\'" href="#0"><i class="uk-icon-angle-double-left"></i></a></li>\'';
+            } else {
+                pageString += '<li class="uk-disabled"><span><i class="uk-icon-angle-double-left"></i></span></li>';
+            }
+            pageString += '<li class="uk-active"><span>' + pageData.page_index + '</span></li>';
+            if (pageData.has_next) {
+                pageString += '<li><a v-attr="onclick:\'gotoPage(\' + ('+pageData.page_index+1 +') + \')\'" href="#0"><i class="uk-icon-angle-double-right"></i></a></li>';
+            }else {
+                pageString += '<li class="uk-disabled"><span><i class="uk-icon-angle-double-right"></i></span></li>';
+            }
+            $("#pageDiv").html(pageString);
+        }
+        $(function() {
+            pageRender(pageData);
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="uk-width-medium-3-4">
+        {% for blog in blogs %}
+            <article class="uk-article">
+                <h2><a href="/blog/{{ blog.id }}">{{ blog.name }}</a></h2>
+                <p class="uk-article-meta">发表于{{ blog.created_date|datetime}}</p>
+                <p>{{ blog.summary }}</p>
+                <div>{{ blog.content }}</div>
+                <p><a href="/blog/{{ blog.id }}">继续阅读 <i class="uk-icon-angle-double-right"></i></a></p>
+            </article>
+            <hr class="uk-article-divider">
+        {% endfor %}
+        <div id="pageDiv"></div>
+    </div>
+    <div class="uk-width-medium-1-4">
+        <div class="uk-panel uk-panel-header">
+            <h3 class="uk-panel-title">友情链接</h3>
+            <ul class="uk-list uk-list-line">
+                <li><i class="uk-icon-thumbs-o-up"></i> <a target="_blank" href="#">读书</a></li>
+                <li><i class="uk-icon-thumbs-o-up"></i> <a target="_blank" href="#">Java</a></li>
+                <li><i class="uk-icon-thumbs-o-up"></i> <a target="_blank" href="#">Python</a></li>
+				<li><i class="uk-icon-thumbs-o-up"></i> <a target="_blank" href="#">JavaScript</a></li>
+                <li><i class="uk-icon-thumbs-o-up"></i> <a target="_blank" href="#">Tool</a></li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

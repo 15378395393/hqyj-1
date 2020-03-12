@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 __author__ = "HymanHu";
-import asyncio, json, os, time;
-import www.orm.Orm;
+import json, www.orm.Orm;
 from www.web.WebHandler import *;
 from aiohttp import web;
-from www.common.GlobalLog import LOGGER;
 from conf.Config import configs;
 from jinja2 import Environment, FileSystemLoader;
 from datetime import datetime;
+from www.common.GlobalLog import LOGGER;
+from www.common.BlogCommons import *;
+from www.common.PythonMonitor import start_watch;
 
 # 时间格式化处理器过滤器
 def datetime_filter(t):
@@ -154,6 +155,8 @@ async def init(loop):
     www.web.WebHandler.add_routes(app, "www.web.BlogController");
     # 注册静态资源
     www.web.WebHandler.add_static(app);
+    # 开启监控文件变更，自动重启 --- 未实现
+    # start_watch(getPath("python_webapp_blog", "www"), None);
     # 启动app
     runner = web.AppRunner(app);
     await runner.setup();

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 __author__ = "HymanHu";
-import re;
+import re, os;
 from www.common.CustomException import *;
 
 # 常量
@@ -80,3 +80,10 @@ def get_page_index(page_str):
     if p < 1:
         p = 1;
     return p;
+
+def getPath(projectName, relationPath):
+    separator = "\\" if os.name == "nt" else "/";
+    projectName = projectName + separator;
+    curPath = os.path.abspath(os.path.dirname(__file__));  # 获取当前文夹路径
+    rootPath = curPath[:curPath.find(projectName) + len(projectName)];  # 获取项目根目录
+    return rootPath + relationPath;
