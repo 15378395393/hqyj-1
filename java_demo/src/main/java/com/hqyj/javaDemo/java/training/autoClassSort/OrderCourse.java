@@ -99,6 +99,7 @@ public class OrderCourse {
 
 	// 从LinkedList<String>中随机取出timesWeek个元素组成的LinkedList<String>
 	public LinkedList<String> randList(LinkedList<String> list, int timesWeek) {
+		System.out.println(list.size() + "=============" + timesWeek);
 		LinkedList<String> subList = new LinkedList<String>();
 		Random rand = new Random();
 

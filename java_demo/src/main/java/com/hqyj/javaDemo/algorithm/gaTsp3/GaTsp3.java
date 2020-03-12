@@ -1,9 +1,9 @@
-package com.hqyj.javaDemo.algorithm;
+package com.hqyj.javaDemo.algorithm.gaTsp3;
 
 import java.util.Arrays;
 import java.util.Calendar;
 
-public class Tsp {
+public class GaTsp3 {
 	private String cityName[] = { "北京", "上海", "天津", "重庆", "哈尔滨", "长春", "沈阳", "呼和浩特", "石家庄", "太原", "济南", "郑州", "西安",
 			"兰州", "银川", "西宁", "乌鲁木齐", "合肥", "南京", "杭州", "长沙", "南昌", "武汉", "成都", "贵州", "福建", "台北", "广州", "海口", "南宁",
 			"昆明", "拉萨", "香港", "澳门" };
@@ -29,7 +29,7 @@ public class Tsp {
 	/**
 	 * 构造函数，初始化种群
 	 */
-	public Tsp() {
+	public GaTsp3() {
 		for (int i = 0; i < popSize; i++) {
 			citys[i] = new genotype();
 			int[] num = new int[cityNum];
@@ -428,7 +428,7 @@ public class Tsp {
 	public static void main(String[] args) {
 
 		Calendar a = Calendar.getInstance(); // 开始时间
-		Tsp tsp = new Tsp();
+		GaTsp3 tsp = new GaTsp3();
 		tsp.run();
 		Calendar b = Calendar.getInstance(); // 结束时间
 		tsp.CalTime(a, b);
