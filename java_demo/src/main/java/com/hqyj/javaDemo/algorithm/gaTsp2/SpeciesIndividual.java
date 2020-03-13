@@ -1,6 +1,8 @@
 package com.hqyj.javaDemo.algorithm.gaTsp2;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -13,25 +15,45 @@ import java.util.stream.IntStream;
  * @date: 2020年3月12日
  */
 public class SpeciesIndividual {
-	String[] genes;// 基因序列
-	float distance;// 路程
-	float fitness;// 适应度
-	SpeciesIndividual next;
-	float rate;
+	// 基因序列
+	public String[] genes;
+	// 计算基因序列总路程
+	public float distance;
+	// 下一个物种
+	public SpeciesIndividual next;
+	// 适应度
+	public float fitness;
+	// 当前物种被选中的概率(this.fitness / 物种群所有物种fitness之和)
+	public float rate;
 
 	public SpeciesIndividual() {
 		this.genes = new String[TSPData.CITY_NUM];
 		this.fitness = 0.0f;
 		this.distance = 0.0f;
 		this.next = null;
-		rate = 0.0f;
+		this.rate = 0.0f;
 	}
 	
-	// 打印数组
+	/**
+	 * -打印数组
+	 */
 	public static void printArrays(String desc, String[] inputArrays) {
+		if (inputArrays == null) {
+			return;
+		}
 		StringBuffer sb = new StringBuffer();
-		sb.append("初始化城市基因序列(" + desc + ")：[").append(String.join("-", inputArrays)).append("]");
+		sb.append(desc).append("[").append(String.join("-", inputArrays)).append("]");
 		System.out.println(sb.toString());
+	}
+	
+	/**
+	 * -打印染色体计算的结果
+	 */
+	public void printResult() {
+		List<String> list = new ArrayList<String>(Arrays.asList(genes));
+		list.add(genes[0]);
+		printArrays("最短路线：", list.toArray(new String[genes.length + 1]));
+		System.out.print("最短距离：" + distance);
 	}
 
 	/**
@@ -53,7 +75,7 @@ public class SpeciesIndividual {
 			genes[i] = tmp;
 		});
 		
-		printArrays("随机模式", genes);
+//		printArrays("初始化城市基因序列(随机模式):", genes);
 	}
 
 	/**
@@ -99,11 +121,13 @@ public class SpeciesIndividual {
 			i = minCity;
 		} while (cityNum < TSPData.CITY_NUM - 1);
 		
-		printArrays("贪婪模式", genes);
+//		printArrays("初始化城市基因序列(贪婪模式)：", genes);
 	}
 
-	// 计算物种适应度
-	void calFitness() {
+	/**
+	 * -计算物种适应度
+	 */
+	public void calFitness() {
 		float totalDis = 0.0f;
 		for (int i = 0; i < TSPData.CITY_NUM; i++) {
 			int curCity = Integer.parseInt(this.genes[i]) - 1;
@@ -116,25 +140,18 @@ public class SpeciesIndividual {
 		this.fitness = 1.0f / totalDis;
 	}
 
-	// 深拷贝
+	/**
+	 * -物种克隆
+	 */
 	public SpeciesIndividual clone() {
 		SpeciesIndividual species = new SpeciesIndividual();
 
-		// 复制值
-		for (int i = 0; i < this.genes.length; i++)
+		for (int i = 0; i < this.genes.length; i++) {
 			species.genes[i] = this.genes[i];
+		}
 		species.distance = this.distance;
 		species.fitness = this.fitness;
 
 		return species;
-	}
-
-	// 打印路径
-	void printRate() {
-		System.out.print("最短路线：");
-		for (int i = 0; i < genes.length; i++)
-			System.out.print(genes[i] + "->");
-		System.out.print(genes[0] + "\n");
-		System.out.print("最短长度：" + distance);
 	}
 }

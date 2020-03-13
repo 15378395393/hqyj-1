@@ -15,81 +15,36 @@ import java.util.Random;
  * @date: 2020年3月12日
  */
 public class GeneticAlgorithm {
-	// 开始遗传
-	SpeciesIndividual run(SpeciesPopulation list) {
-		// 创建初始种群
-		createBeginningSpecies(list);
-
-		for (int i = 1; i <= TSPData.DEVELOP_NUM; i++) {
-			// 选择
-			select(list);
-
+	
+	// 进化代数
+	public static final int DEVELOP_NUM = 1000;
+	
+	
+	/**
+	 * 通过遗传算法获取最优物种
+	 * @param speciesPopulation		初代物种群
+	 * @return
+	 */
+	public SpeciesIndividual getSpeciesByGA(SpeciesPopulation speciesPopulation) {
+		for (int i = 1; i <= DEVELOP_NUM; i++) {
+			System.out.println("==============开始第" + i + "次迭代===========");
+			// 选择函数
+			selectFunction(speciesPopulation);
 			// 交叉
-			crossover(list);
-
+			crossover(speciesPopulation);
 			// 变异
-			mutate(list);
+			mutate(speciesPopulation);
 		}
 
-		return getBest(list);
-	}
-
-	// 创建初始种群
-	void createBeginningSpecies(SpeciesPopulation list) {
-		// 100%随机
-		int randomNum = (int) (TSPData.SPECIES_NUM);
-		for (int i = 1; i <= randomNum; i++) {
-			SpeciesIndividual species = new SpeciesIndividual();// 创建结点
-			species.createByRandomGenes();// 初始种群基因
-
-			list.add(species);// 添加物种
-		}
-
-		// //40%贪婪
-		// int greedyNum=TSPData.SPECIES_NUM-randomNum;
-		// for(int i=1;i<=greedyNum;i++)
-		// {
-		// SpeciesIndividual species=new SpeciesIndividual();//创建结点
-		// species.createByGreedyGenes();//初始种群基因
-		//
-		// this.add(species);//添加物种
-		// }
-	}
-
-	// 计算每一物种被选中的概率
-	void calRate(SpeciesPopulation list) {
-		// 计算总适应度
-		float totalFitness = 0.0f;
-		list.speciesNum = 0;
-		SpeciesIndividual point = list.head.next;// 游标
-		while (point != null)// 寻找表尾结点
-		{
-			point.calFitness();// 计算适应度
-
-			totalFitness += point.fitness;
-			list.speciesNum++;
-
-			point = point.next;
-		}
-
-		// 计算选中概率
-		point = list.head.next;// 游标
-		while (point != null)// 寻找表尾结点
-		{
-			point.rate = point.fitness / totalFitness;
-			point = point.next;
-		}
+		return getBest(speciesPopulation);
 	}
 
 	// 选择优秀物种（轮盘赌）
-	void select(SpeciesPopulation list) {
-		// 计算适应度
-		calRate(list);
-
+	public void selectFunction(SpeciesPopulation speciesPopulation) {
 		// 找出最大适应度物种
 		float talentDis = Float.MAX_VALUE;
 		SpeciesIndividual talentSpecies = null;
-		SpeciesIndividual point = list.head.next;// 游标
+		SpeciesIndividual point = speciesPopulation.head.next;// 游标
 
 		while (point != null) {
 			if (talentDis > point.distance) {
@@ -101,7 +56,7 @@ public class GeneticAlgorithm {
 
 		// 将最大适应度物种复制talentNum个
 		SpeciesPopulation newSpeciesPopulation = new SpeciesPopulation();
-		int talentNum = (int) (list.speciesNum / 4);
+		int talentNum = (int) (speciesPopulation.SPECIES_COUNT / 4);
 		for (int i = 1; i <= talentNum; i++) {
 			// 复制物种至新表
 			SpeciesIndividual newSpecies = talentSpecies.clone();
@@ -109,12 +64,12 @@ public class GeneticAlgorithm {
 		}
 
 		// 轮盘赌list.speciesNum-talentNum次
-		int roundNum = list.speciesNum - talentNum;
+		int roundNum = speciesPopulation.SPECIES_COUNT - talentNum;
 		for (int i = 1; i <= roundNum; i++) {
 			// 产生0-1的概率
 			float rate = (float) Math.random();
 
-			SpeciesIndividual oldPoint = list.head.next;// 游标
+			SpeciesIndividual oldPoint = speciesPopulation.head.next;// 游标
 			while (oldPoint != null && oldPoint != talentSpecies)// 寻找表尾结点
 			{
 				if (rate <= oldPoint.rate) {
@@ -129,7 +84,7 @@ public class GeneticAlgorithm {
 			}
 			if (oldPoint == null || oldPoint == talentSpecies) {
 				// 复制最后一个
-				point = list.head;// 游标
+				point = speciesPopulation.head;// 游标
 				while (point.next != null)// 寻找表尾结点
 					point = point.next;
 				SpeciesIndividual newSpecies = point.clone();
@@ -137,7 +92,7 @@ public class GeneticAlgorithm {
 			}
 
 		}
-		list.head = newSpeciesPopulation.head;
+		speciesPopulation.head = newSpeciesPopulation.head;
 	}
 
 	// 交叉操作
@@ -147,7 +102,7 @@ public class GeneticAlgorithm {
 		if (rate > TSPData.pcl && rate < TSPData.pch) {
 			SpeciesIndividual point = list.head.next;// 游标
 			Random rand = new Random();
-			int find = rand.nextInt(list.speciesNum);
+			int find = rand.nextInt(list.SPECIES_COUNT);
 			while (point != null && find != 0)// 寻找表尾结点
 			{
 				point = point.next;

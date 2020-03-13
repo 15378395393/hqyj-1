@@ -8,13 +8,13 @@ public class MainRun {
 		GeneticAlgorithm GA = new GeneticAlgorithm();
 
 		// 创建初始种群
-		SpeciesPopulation speciesPopulation = new SpeciesPopulation();
+		SpeciesPopulation speciesPopulation = SpeciesPopulation.initSpeciesPopulation();
 
 		// 开始遗传算法（选择算子、交叉算子、变异算子）
-		SpeciesIndividual bestRate = GA.run(speciesPopulation);
+		SpeciesIndividual bestRate = GA.getSpeciesByGA(speciesPopulation);
 
 		// 打印路径与最短距离
-		bestRate.printRate();
+		bestRate.printResult();
 
 	}
 }
