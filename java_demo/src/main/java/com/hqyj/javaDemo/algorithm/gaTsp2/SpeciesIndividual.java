@@ -35,14 +35,18 @@ public class SpeciesIndividual {
 	}
 	
 	/**
-	 * -打印数组
+	 * -打印基因染色体信息
 	 */
-	public static void printArrays(String desc, String[] inputArrays) {
-		if (inputArrays == null) {
+	public static void printIndividualInfo(String desc, SpeciesIndividual individual) {
+		if (individual == null) {
 			return;
 		}
 		StringBuffer sb = new StringBuffer();
-		sb.append(desc).append("[").append(String.join("-", inputArrays)).append("]");
+		sb.append(desc)
+			.append("[").append(String.join("-", individual.genes)).append("]").append("--")
+			.append(individual.distance).append("--")
+			.append(individual.fitness).append("--")
+			.append(individual.rate);
 		System.out.println(sb.toString());
 	}
 	
@@ -52,7 +56,7 @@ public class SpeciesIndividual {
 	public void printResult() {
 		List<String> list = new ArrayList<String>(Arrays.asList(genes));
 		list.add(genes[0]);
-		printArrays("最短路线：", list.toArray(new String[genes.length + 1]));
+		System.out.println("最短路线：" + String.join("-", list.toArray(new String[genes.length + 1])));
 		System.out.print("最短距离：" + distance);
 	}
 
@@ -75,7 +79,7 @@ public class SpeciesIndividual {
 			genes[i] = tmp;
 		});
 		
-//		printArrays("初始化城市基因序列(随机模式):", genes);
+//		printIndividualInfo("初始化城市基因序列(随机模式):", this);
 	}
 
 	/**
@@ -121,7 +125,7 @@ public class SpeciesIndividual {
 			i = minCity;
 		} while (cityNum < TSPData.CITY_NUM - 1);
 		
-//		printArrays("初始化城市基因序列(贪婪模式)：", genes);
+//		printIndividualInfo("初始化城市基因序列(贪婪模式)：", this);
 	}
 
 	/**

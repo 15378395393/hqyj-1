@@ -8,8 +8,10 @@ package com.hqyj.javaDemo.algorithm.gaTsp2;
  * @date: 2020年3月12日
  */
 public class SpeciesPopulation {
-	// 物种数量
-	public static final int SPECIES_COUNT = 4;
+	// 物种初始化数量
+	public static final int SPECIES_INITIALIZE_COUNT = 20;
+	// 物种经过选择函数后剩余数量
+	public int speciesNumber = 0;
 	// 起点物种
 	public SpeciesIndividual head;
 
@@ -34,30 +36,13 @@ public class SpeciesPopulation {
 	}
 	
 	/**
-	 * 遍历物种链条
-	 */
-	public void traversal() {
-		System.out.println("=====初始化物种群链条=====");
-		SpeciesIndividual.printArrays("物种链条head:", head.genes);
-		// 设置游标
-		SpeciesIndividual point = head.next;
-		// 移动游标到next上，寻找链条末端next
-		int i = 1;
-		while (point != null) {
-			SpeciesIndividual.printArrays("物种链条next" + i + ":", point.genes);
-			point = point.next;
-			i ++;
-		}
-	}
-
-	/**
 	 * 初始化物种群
 	 */
 	public static SpeciesPopulation initSpeciesPopulation() {
 		SpeciesPopulation speciesPopulation = new SpeciesPopulation();
 		
 		// 随机模式添加物种
-		for (int i = 0; i < SpeciesPopulation.SPECIES_COUNT; i++) {
+		for (int i = 0; i < SpeciesPopulation.SPECIES_INITIALIZE_COUNT; i++) {
 			SpeciesIndividual species = new SpeciesIndividual();
 			species.createByRandomGenes();
 			speciesPopulation.add(species);
@@ -74,7 +59,7 @@ public class SpeciesPopulation {
 		calFitnessAndRate(speciesPopulation);
 		
 		// 遍历物种链条
-		speciesPopulation.traversal();
+		speciesPopulation.printPopulationInfo("初始化物种群");
 		
 		return speciesPopulation;
 	}
@@ -98,6 +83,31 @@ public class SpeciesPopulation {
 		while (point != null) {
 			point.rate = point.fitness / totalFitness;
 			point = point.next;
+		}
+	}
+	
+	// 克隆一个物种群
+	public static SpeciesPopulation clonePopulation(SpeciesPopulation speciesPopulation) {
+		SpeciesPopulation newPopulation = new SpeciesPopulation();
+		newPopulation.head = speciesPopulation.head;
+		newPopulation.speciesNumber = speciesPopulation.speciesNumber;
+		return newPopulation;
+	}
+	
+	/**
+	 * 打印物种群信息
+	 */
+	public void printPopulationInfo(String desc) {
+		System.out.println("----" + desc + "----");
+		SpeciesIndividual.printIndividualInfo("物种链条head:", head);
+		// 设置游标
+		SpeciesIndividual point = head.next;
+		// 移动游标到next上，寻找链条末端next
+		int i = 1;
+		while (point != null) {
+			SpeciesIndividual.printIndividualInfo("物种链条next" + i + ":", point);
+			point = point.next;
+			i ++;
 		}
 	}
 }

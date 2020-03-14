@@ -2,8 +2,6 @@ package com.hqyj.javaDemo.algorithm.gaTsp2;
 
 public class MainRun {
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
 		// 创建遗传算法驱动对象
 		GeneticAlgorithm GA = new GeneticAlgorithm();
 
@@ -14,7 +12,7 @@ public class MainRun {
 		SpeciesIndividual bestRate = GA.getSpeciesByGA(speciesPopulation);
 
 		// 打印路径与最短距离
-		bestRate.printResult();
+//		bestRate.printResult();
 
 	}
 }
