@@ -63,7 +63,7 @@ public class SpeciesIndividual {
 	/**
 	 * -初始化基因，随机模式
 	 */
-	void createByRandomGenes() {
+	void createByRandomGenes(int startCityId) {
 		// 初始化基因为1-CITY_NUM序列
 		for (int i = 0; i < genes.length; i++) {
 			genes[i] = Integer.toString(i + 1);
@@ -73,10 +73,18 @@ public class SpeciesIndividual {
 		Random rand = new Random();
 		IntStream.range(0, genes.length).forEach(i -> {
 			int num = i + rand.nextInt(genes.length - i);
-			String tmp;
-			tmp = genes[num];
+			String tmp = genes[num];
 			genes[num] = genes[i];
 			genes[i] = tmp;
+		});
+		
+		// 将startCityId提到第一位
+		IntStream.range(0, genes.length).forEach(i -> {
+			if (genes[i].equals(String.valueOf(startCityId))) {
+				String tmp = genes[0];
+				genes[0] = genes[i];
+				genes[i] = tmp;
+			}
 		});
 		
 //		printIndividualInfo("初始化城市基因序列(随机模式):", this);
@@ -85,7 +93,7 @@ public class SpeciesIndividual {
 	/**
 	 * -初始化基因，贪婪模式
 	 */
-	void createByGreedyGenes() {
+	void createByGreedyGenes(int startCityId) {
 		Random rand = new Random();
 		// 随机产生一个城市作为起点
 		int i = rand.nextInt(TSPData.CITY_NUM);
@@ -125,20 +133,33 @@ public class SpeciesIndividual {
 			i = minCity;
 		} while (cityNum < TSPData.CITY_NUM - 1);
 		
+		// 将startCityId提到第一位
+		IntStream.range(0, genes.length).forEach(item -> {
+			if (genes[item].equals(String.valueOf(startCityId))) {
+				String tmp = genes[0];
+				genes[0] = genes[item];
+				genes[item] = tmp;
+			}
+		});
+		
 //		printIndividualInfo("初始化城市基因序列(贪婪模式)：", this);
 	}
 
 	/**
-	 * -计算物种适应度
+	 * -计算物种总距离、适应度
 	 */
 	public void calFitness() {
 		float totalDis = 0.0f;
+		int nextCity = 0;
 		for (int i = 0; i < TSPData.CITY_NUM; i++) {
 			int curCity = Integer.parseInt(this.genes[i]) - 1;
-			int nextCity = Integer.parseInt(this.genes[(i + 1) % TSPData.CITY_NUM]) - 1;
+			nextCity = Integer.parseInt(this.genes[(i + 1) % TSPData.CITY_NUM]) - 1;
 
 			totalDis += TSPData.disMap[curCity][nextCity];
 		}
+		
+		// 累加回到原点的距离
+		totalDis += TSPData.disMap[nextCity][Integer.parseInt(this.genes[0]) - 1];
 
 		this.distance = totalDis;
 		this.fitness = 1.0f / totalDis;

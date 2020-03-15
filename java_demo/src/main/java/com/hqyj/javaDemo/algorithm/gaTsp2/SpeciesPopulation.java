@@ -36,23 +36,23 @@ public class SpeciesPopulation {
 	}
 	
 	/**
-	 * 初始化物种群
+	 * 初始化物种群，传入起始id
 	 */
-	public static SpeciesPopulation initSpeciesPopulation() {
+	public static SpeciesPopulation initSpeciesPopulation(int startCityId) {
 		SpeciesPopulation speciesPopulation = new SpeciesPopulation();
 		
 		// 随机模式添加物种
 		for (int i = 0; i < SpeciesPopulation.SPECIES_INITIALIZE_COUNT; i++) {
 			SpeciesIndividual species = new SpeciesIndividual();
-			species.createByRandomGenes();
+			species.createByRandomGenes(startCityId);
 			speciesPopulation.add(species);
 		}
 		
 		 // 贪婪模式添加物种
-//		 for(int i = 0; i < SpeciesPopulation.SPECIES_COUNT; i++) {
+//		 for(int i = 0; i < SpeciesPopulation.SPECIES_INITIALIZE_COUNT; i++) {
 //			 SpeciesIndividual species=new SpeciesIndividual();
-//			 species.createByGreedyGenes();
-//			 list.add(species);
+//			 species.createByGreedyGenes(startCityId);
+//			 speciesPopulation.add(species);
 //		 }
 		
 		// 计算每个物种适应度和被选中的几率
@@ -89,7 +89,11 @@ public class SpeciesPopulation {
 	// 克隆一个物种群
 	public static SpeciesPopulation clonePopulation(SpeciesPopulation speciesPopulation) {
 		SpeciesPopulation newPopulation = new SpeciesPopulation();
-		newPopulation.head = speciesPopulation.head;
+		SpeciesIndividual point = speciesPopulation.head.next;
+		while (point != null) {
+			newPopulation.add(point.clone());
+			point = point.next;
+		}
 		newPopulation.speciesNumber = speciesPopulation.speciesNumber;
 		return newPopulation;
 	}

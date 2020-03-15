@@ -17,7 +17,7 @@ import java.util.Random;
 public class GeneticAlgorithm {
 	
 	// 进化代数
-	public static final int DEVELOP_NUM = 1;
+	public static final int DEVELOP_NUM = 100;
 	// 交叉概率
 	public static final float PCL = 0.2f, PCH = 0.95f;
 	// 变异概率
@@ -25,21 +25,25 @@ public class GeneticAlgorithm {
 	
 	/**
 	 * 通过遗传算法获取最优物种
-	 * @param speciesPopulation		初代物种群
 	 * @return
 	 */
-	public SpeciesIndividual getSpeciesByGA(SpeciesPopulation speciesPopulation) {
+	public SpeciesIndividual getSpeciesByGA(int startCityId) {
+		// 创建初始种群
+		SpeciesPopulation parent = SpeciesPopulation.initSpeciesPopulation(startCityId);
+		
 		for (int i = 1; i <= DEVELOP_NUM; i++) {
 			System.out.println("==============开始第 " + i + " 次进化===========");
 			// 选择函数
-			selectFunction(speciesPopulation);
-			// 交叉
-			crossoverFunction(speciesPopulation);
-			// 变异
-//			mutate(speciesPopulation);
+			selectFunction(parent);
+			// 通过交叉函数产生子物种群
+			SpeciesPopulation childrenPopulation = buildChildrenPopulation(parent);
+			// 变异函数
+			mutateFunction(childrenPopulation);
+			// 将变异后的子物种群添加到父物种群中
+			reBuildParentPopulation(parent, childrenPopulation);
 		}
 
-		return getBest(speciesPopulation);
+		return getBest(parent);
 	}
 
 	// 选择函数（轮盘赌）
@@ -81,34 +85,41 @@ public class GeneticAlgorithm {
 		speciesPopulation.printPopulationInfo("选择函数后物种群");
 	}
 	
-	// 补全物种群
-	public void completionPopulation(SpeciesPopulation speciesPopulation) {
-		SpeciesIndividual point = speciesPopulation.head.next;
-		int index = 1;
-		while (point != null) {
-			if (index > speciesPopulation.speciesNumber) {
-				
+	/**
+	 * -根据父类物种群，通过交叉函数生成子代物种群
+	 * @param parentPopulation	父类物种群
+	 */
+	public SpeciesPopulation buildChildrenPopulation(SpeciesPopulation parentPopulation) {
+		SpeciesPopulation childrenPopulation = new SpeciesPopulation();
+		int childrenNumber = 
+				SpeciesPopulation.SPECIES_INITIALIZE_COUNT - parentPopulation.speciesNumber;
+		int index = 0;
+		while (index < childrenNumber) {
+			SpeciesPopulation clone = SpeciesPopulation.clonePopulation(parentPopulation);
+			SpeciesIndividual child = crossoverFunction(clone);
+			if (child != null) {
+				childrenPopulation.add(child.clone());
+				index ++;
 			}
-			point = point.next;
-			index ++;
 		}
-
-		// 打印物种群信息
-		speciesPopulation.printPopulationInfo("交叉函数后物种群");
+		
+		// 打印子物种群信息
+		childrenPopulation.printPopulationInfo("父物种群交叉后产生子物种群");
+		
+		return childrenPopulation;
 	}
 	
 	// 交叉函数（交叉后的结果作为son）
-	public SpeciesIndividual crossoverFunction(SpeciesPopulation speciesPopulation) {
+	public SpeciesIndividual crossoverFunction(SpeciesPopulation population) {
 		// 以概率pcl~pch进行
 		float rate = (float) Math.random();
 		if (rate > PCL && rate < PCH) {
-			System.out.println("######");
 			// 寻找物种群随机位
 			Random rand = new Random();
-			int startIndex = rand.nextInt(speciesPopulation.speciesNumber);
+			int startIndex = rand.nextInt(population.speciesNumber);
 			
 			// 找出startIndex位上的物种
-			SpeciesIndividual point = speciesPopulation.head.next;
+			SpeciesIndividual point = population.head.next;
 			while (point != null && startIndex != 0) {
 				point = point.next;
 				startIndex--;
@@ -116,8 +127,8 @@ public class GeneticAlgorithm {
 
 			// 从startIndex位开始交叉
 			if (point.next != null) {
-				// 找出该物种genes随机位
-				int begin = rand.nextInt(TSPData.CITY_NUM);
+				// 找出该物种genes随机位，排除起始位
+				int begin = rand.nextInt(TSPData.CITY_NUM - 1) + 1;
 
 				// 取point和point.next进行交叉，形成新的两个染色体
 				for (int i = begin; i < TSPData.CITY_NUM; i++) {
@@ -136,24 +147,27 @@ public class GeneticAlgorithm {
 					point.genes[fir] = point.next.genes[i];
 					point.next.genes[sec] = point.genes[i];
 				}
+				return point;
+			} else {
+				return null;
 			}
-			return point;
 		} else {
 			return null;
 		}
 	}
 
-	// 变异操作
-	void mutate(SpeciesPopulation list) {
+	// 物种群变异
+	public void mutateFunction(SpeciesPopulation population) {
 		// 每一物种均有变异的机会,以概率pm进行
-		SpeciesIndividual point = list.head.next;
+		SpeciesIndividual point = population.head.next;
+		int index = 1;
 		while (point != null) {
 			float rate = (float) Math.random();
 			if (rate < PM) {
-				// 寻找逆转左右端点
+				// 寻找逆转左右端点，排除起始位
 				Random rand = new Random();
-				int left = rand.nextInt(TSPData.CITY_NUM);
-				int right = rand.nextInt(TSPData.CITY_NUM);
+				int left = rand.nextInt(TSPData.CITY_NUM -1) + 1;
+				int right = rand.nextInt(TSPData.CITY_NUM - 1) + 1;
 				if (left > right) {
 					int tmp;
 					tmp = left;
@@ -171,9 +185,29 @@ public class GeneticAlgorithm {
 					left++;
 					right--;
 				}
+//				System.out.println(index + "变异点：" + point.genes[left]);
 			}
+			index ++;
 			point = point.next;
 		}
+		
+		// 打印物种群信息
+		population.printPopulationInfo("子物种群变异");
+	}
+	
+	// 将子物种群添加到父物种群中，形成新的父物种群
+	public void reBuildParentPopulation(SpeciesPopulation parent, SpeciesPopulation children) {
+		SpeciesIndividual point = parent.head.next;
+		// 找出父物种群尾部物种
+		while (point.next != null) {
+			point = point.next;
+		}
+		point.next = children.head.next;
+		
+		// 重新计算距离、适应度、选中几率
+		SpeciesPopulation.calFitnessAndRate(parent);
+		
+		parent.printPopulationInfo("新的父物种群");
 	}
 
 	// 获得适应度最大的物种
@@ -192,5 +226,11 @@ public class GeneticAlgorithm {
 		}
 
 		return bestSpecies;
+	}
+	
+	public static void main(String[] args) {
+		GeneticAlgorithm ga = new GeneticAlgorithm();
+		SpeciesIndividual bestIndividual = ga.getSpeciesByGA(12);
+		bestIndividual.printResult();
 	}
 }
