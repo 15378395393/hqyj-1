@@ -111,6 +111,17 @@ public class Training {
 		return encrypt(input, -x);
 	}
 	
+	/**
+	 * -等号右边从左往右，a放3到寄存器，继续执行（a++），自增在后，放3到寄存器，接着a自增为4，最后一个a++放寄存器为4，a再自增变5
+	 * -计算结果是将寄存器的值进行相加，结果10，赋值给a
+	 * a的值变化：3-4-5-10
+	 */
+	public static void selfAdd() {
+		int a = 3;
+		a = a + (a++) + a++;
+		System.out.println(a);
+	}
+	
 	public static void main(String[] args) {
 		Training training = new Training();
 		IntStream.range(0, 100).forEach(item -> {
@@ -128,6 +139,18 @@ public class Training {
 		x = (char) (x + 3);
 		x += 3;
 		x = 'a' + 3;
+		
+		selfAdd();
+		
+		
+		char xx = 'b';
+		int i = 0;
+		int j = 11;
+		System.out.println(true ? xx : 0);
+		System.out.println(true ? xx : 65536.00);
+		System.out.println(true ? xx : 111111111);
+		System.out.println(false ? i: xx);
+		System.out.println(true ? j : 65536.00);
 	}
 	
 }

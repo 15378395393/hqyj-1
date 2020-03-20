@@ -9,7 +9,6 @@
 		</div>
 		<ul class="layui-nav right">
 			<input type="hidden" id="userId" th:value="${user.userId}"/>
-			<li class="layui-nav-item"><span th:text=${session.userObject.userName}></span></li>
 			<li class="layui-nav-item"><a href="javascript:;"><span th:text="${user.userName == null ? '???' : user.userName}"></span></a>
 				<dl class="layui-nav-child">
 					<!-- 二级菜单 -->
