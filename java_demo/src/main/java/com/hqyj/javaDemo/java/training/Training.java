@@ -72,6 +72,26 @@ public class Training {
 		});
 	}
 	
+	
+	/**
+	 * -鸡蛋1毛一个，鸭蛋3块一个，鹅蛋6块一个，三种各买多少，正好100
+	 */
+	public void loopTest() {
+		int sum1, sum2 = 0;
+		for (int a = 0; a <= 100; a ++) {
+			for (int b = 0; b <= 100; b ++) {
+				for (int c = 0; c <= 100; c ++) {
+					sum1 = a + 30 * b + 60 * c;
+					sum2 = a + b + c;
+					if (sum1 == 1000 && sum2 == 100) {
+						System.out.println(String.format("买鸡蛋%,d, 买鸭蛋%d, 买鹅蛋%d.", a, b , c));
+						break;
+					}
+				}
+			}
+		}
+	}
+	
 	/**
 	 * -通过把字符移动一定的位数来实现英文字符的加密和解密
 	 * @param c		输入的字符
@@ -142,15 +162,7 @@ public class Training {
 		
 		selfAdd();
 		
-		
-		char xx = 'b';
-		int i = 0;
-		int j = 11;
-		System.out.println(true ? xx : 0);
-		System.out.println(true ? xx : 65536.00);
-		System.out.println(true ? xx : 111111111);
-		System.out.println(false ? i: xx);
-		System.out.println(true ? j : 65536.00);
+		training.loopTest();
 	}
 	
 }
